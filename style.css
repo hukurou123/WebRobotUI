@@ -1,8 +1,154 @@
-#tbl{
-    border: 1px;
+body{
+    margin: 20px;
+    background-color: #789DBC;
+}
+
+table, th, td{
     border-collapse: collapse;
+    border: 5px solid #afccb8;
+    margin: 20px;
+    margin-bottom: 5px;
+}
+
+th, td{
+    width: 50px;
 }
 
 th{
-    width: 50px;
+    color: #333333;
+    background-color: #FFE3E3;
+}
+
+td{
+    background: #FEF9F2;
+}
+
+p{
+    text-align: center;
+    margin: 0px;
+}
+
+li{
+    list-style: none;
+}
+
+button{
+    width: 30px;
+    height: 30px;
+    font-size: 18px;
+    background: #FEF9F2;
+    color: #333333;
+    border: none;
+    border-radius: 4px;
+}
+
+.ip_input{
+    font-size: 20px;
+    padding: 10px;
+    display: flex;
+}
+
+.tab{
+    display: flex;
+    flex-wrap: wrap;
+    padding-left: 0px;
+    margin-bottom: -0.5px;
+}
+
+.tab li a{
+    display: block;
+    background: #84998a;
+    margin: 0.2px;
+    padding: 10px 20px;
+    text-decoration: none;
+    color: #222222;
+    margin-right: 1px;
+}
+
+.tab li.active a{
+    background: #afccb8;
+}
+
+.area{
+    display: none;
+    opacity: 0;
+    background: #afccb8;
+    padding: 10px 20px;
+}
+
+.area.is-active{
+    display: block;
+    animation-duration: 2s;
+    animation-fill-mode: forwards;
+    opacity: 1;
+}
+
+#val{
+    background: #FEF9F2;
+    border: none;
+    width: 150px;
+    height: 25px;
+    text-align: center;
+}
+
+#ip{
+    color: #FEF9F2;
+    margin: 10px;
+}
+
+#ip_name{
+    width: 150px;
+    height: 20px;
+    font-size: 20px;
+    text-align: right;
+    background-color: #FEF9F2;
+    color: #333333;
+    border: none;
+    border-radius: 3px;
+    margin-top: 14px;
+    margin-right: 9px;
+}
+
+#ip_name:focus{
+    outline: none;
+    border: none;
+    border-bottom: 2px solid #212b33;
+}
+
+#ip_button{
+    width: 70px;
+    height: 26px;
+    margin-top: 12px;
+    background: #FEF9F2;
+    color: #333333;
+    border: none;
+    border-radius: 4px;
+}
+
+#ip_button:hover{
+    background: #ccc8c2;
+}
+
+#ip_button:active{
+    background: #999691;
+}
+
+button:hover{
+    background: #ccc8c2;
+}
+
+button:active{
+    background: #999691;
+}
+
+#add_del_button{
+    display: flex;
+}
+
+#add{
+    margin-left: 24px;
+}
+
+#del{
+    margin-left: 3px;
 }

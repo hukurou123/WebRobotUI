@@ -6,41 +6,61 @@
 <title>connect</title>
 <link href="style.css" rel="stylesheet">
 </head>
-<body>
+<body onload="add()">
 
 <div id="wrapper">
-    <header>
-        <div class="connect">
-            <div class="ip_input">
-                <label for="ip_name" id="ip">Broker IP</label>
-                <input type="text" id="ip_name" name="ip_name" size="20">
-                <input type="button" value="connect">
+    <main>
+        
+        <div class="ip_input">
+            <label for="ip_name" id="ip">Broker IP</label>
+            <input type="text" id="ip_name" name="ip_name" size="20" value="192.168.1.1">
+            <input type="button" id="ip_button" value="connect">
+        </div>
+        <ul class="tab">
+            <li><a href="#aaa">aaa</a></li>
+            <li><a href="#iii">iii</a></li>
+            <li><a href="#uuu">uuu</a></li>
+        </ul>
+            
+        <div id="aaa" class="area">
+            <table id="tbl">
+                <tr>
+                    <th> </th>
+                    <th>Key</th>
+                    <th>ivent</th> 
+                    <th>topic</th> 
+                    <th>msg</th>
+                </tr>
+            </table>
+            <div id="add_del_button">
+                <button id="add" onclick="add()">+</button>
+                <button id="del" onclick="del()">−</button>
             </div>
-            <div class="result">
-                <table id="tbl">
-                    <tr>
-                        <th> </th>
-                        <th>Key</th>
-                        <th>ivent</th> 
-                        <th>topic</th> 
-                        <th>msg</th>
-                    </tr>
-                </table>
-                <div>
-                    <button onclick="add()">+</button>
-                    <button onclick="del()">-</button>
-                </div>
-            </div>
+        </div>
+        <div id="iii" class="area">
+            <h2>どんぐり</h2>
+            <ul>
+                <li>まつぼっくり</li>
+                <li>くるみ</li>
+                <li>くこのみ</li>
+            </ul>
+        </div>
+        <div id="uuu" class="area">
+            <h2>だいなそー</h2>
+            <ul>
+                <li>てぃらの</li>
+                <li>すぴの</li>
+                <li>とりけら</li>
+            </ul>
         </div>
     </main>
 
     <footer>
-        <div class="container">
-            <p>Takano tenchi</p>   
-        </div>
+        <p>Takano tenchi</p>   
     </footer>
 </div>
 
+<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <script>
     const tbl = document.getElementById("tbl");
 
@@ -51,8 +71,8 @@
         for(let i=0;i<5;i++){
             if (i==0){
                 let td = document.createElement("td");
-                const p1 = document.createElement("p");
-                const text1 = document.createTextNode(rw);
+                let p1 = document.createElement("p");
+                let text1 = document.createTextNode(rw);
                 p1.appendChild(text1);
                 td.appendChild(p1);
                 tr.appendChild(td);
@@ -65,11 +85,13 @@
                     op.text = iv[num];
                     sl.appendChild(op);
                 }
+                sl.setAttribute("id", "val");
                 td.appendChild(sl);
                 tr.appendChild(td);
             }else{
                 let td = document.createElement("td");
                 let inp = document.createElement("input");
+                inp.setAttribute("id", "val");
                 td.appendChild(inp);
                 tr.appendChild(td);
             }
@@ -79,8 +101,50 @@
 
     function del(){
         let rw = tbl.rows.length;
-        tbl.deleteRow(rw-1);
+        if (rw>2){
+            tbl.deleteRow(rw-1);
+        }
     }
+    //任意のタブにURLからリンクするための設定
+    function GethashID (hashIDName){
+        if(hashIDName){
+            //タブ設定
+            $('.tab li').find('a').each(function() { //タブ内のaタグ全てを取得
+                var idName = $(this).attr('href'); //タブ内のaタグのリンク名（例）#lunchの値を取得	
+                if(idName == hashIDName){ //リンク元の指定されたURLのハッシュタグ（例）http://example.com/#lunch←この#の値とタブ内のリンク名（例）#lunchが同じかをチェック
+                    var parentElm = $(this).parent(); //タブ内のaタグの親要素（li）を取得
+                    $('.tab li').removeClass("active"); //タブ内のliについているactiveクラスを取り除き
+                    $(parentElm).addClass("active"); //リンク元の指定されたURLのハッシュタグとタブ内のリンク名が同じであれば、liにactiveクラスを追加
+                    //表示させるエリア設定
+                    $(".area").removeClass("is-active"); //もともとついているis-activeクラスを取り除き
+                    $(hashIDName).addClass("is-active"); //表示させたいエリアのタブリンク名をクリックしたら、表示エリアにis-activeクラスを追加	
+                }
+            });
+        }
+    }
+    //タブをクリックしたら
+    $('.tab a').on('click', function() {
+        var idName = $(this).attr('href'); //タブ内のリンク名を取得	
+        GethashID (idName);//設定したタブの読み込みと
+        return false;//aタグを無効にする
+    });
+    // 上記の動きをページが読み込まれたらすぐに動かす
+    $(window).on('load', function () {
+        $('.tab li:first-of-type').addClass("active"); //最初のliにactiveクラスを追加
+        $('.area:first-of-type').addClass("is-active"); //最初の.areaにis-activeクラスを追加
+        var hashName = location.hash; //リンク元の指定されたURLのハッシュタグを取得
+        GethashID (hashName);//設定したタブの読み込み
+    });
+
+    $(window).on('load', function () {
+        var hashName = location.hash; // ハッシュタグを取得
+        if (hashName) {
+            GethashID(hashName); // ハッシュタグがある場合、それに対応するタブを開く
+        } else {
+            $('.tab li:first-of-type').addClass("active"); // 最初のliにactiveクラスを追加
+            $('.area:first-of-type').addClass("is-active"); // 最初の.areaにis-activeクラスを追加
+        }
+    });
 </script>
 
 </body>
