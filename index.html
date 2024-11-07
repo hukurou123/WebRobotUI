@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>connect</title>
+<link href="style.css" rel="stylesheet">
+</head>
+<body>
+
+<div id="wrapper">
+    <header>
+        <div class="connect">
+            <div class="ip_input">
+                <label for="ip_name" id="ip">Broker IP</label>
+                <input type="text" id="ip_name" name="ip_name" size="20">
+                <input type="button" value="connect">
+            </div>
+            <div class="result">
+                <table id="tbl">
+                    <tr>
+                        <th> </th>
+                        <th>Key</th>
+                        <th>ivent</th> 
+                        <th>topic</th> 
+                        <th>msg</th>
+                    </tr>
+                </table>
+                <div>
+                    <button onclick="add()">+</button>
+                    <button onclick="del()">-</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>Takano tenchi</p>   
+        </div>
+    </footer>
+</div>
+
+<script>
+    const tbl = document.getElementById("tbl");
+
+    function add(){
+        let rw = tbl.rows.length;
+        let tr = document.createElement("tr");
+        let iv = ["down", "up"];
+        for(let i=0;i<5;i++){
+            if (i==0){
+                let td = document.createElement("td");
+                const p1 = document.createElement("p");
+                const text1 = document.createTextNode(rw);
+                p1.appendChild(text1);
+                td.appendChild(p1);
+                tr.appendChild(td);
+            }
+            else if (i==2){
+                let td = document.createElement("td");
+                let sl = document.createElement('select');
+                for (let num in iv){
+                    let op = document.createElement('option');
+                    op.text = iv[num];
+                    sl.appendChild(op);
+                }
+                td.appendChild(sl);
+                tr.appendChild(td);
+            }else{
+                let td = document.createElement("td");
+                let inp = document.createElement("input");
+                td.appendChild(inp);
+                tr.appendChild(td);
+            }
+        }
+        tbl.appendChild(tr);
+    }
+
+    function del(){
+        let rw = tbl.rows.length;
+        tbl.deleteRow(rw-1);
+    }
+</script>
+
+</body>
+</html>
