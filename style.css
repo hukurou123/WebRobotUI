@@ -196,17 +196,17 @@ button:active{
 }
 
 #add_del_button{
-    display: flex;
+    /* display: flex; */
     position: absolute;
     bottom: 2%;
-    left: 11%;
+    left: 10%;
     transform: translate(-50%, -50%);
 }
 
-#add{
+/* #add{
     margin-left: 24px;
-}
+} */
 
-#del{
+/* #del{
     margin-left: 3px;
-}
+} */
