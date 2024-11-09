@@ -31,6 +31,7 @@
                         <th>ivent</th> 
                         <th>topic</th> 
                         <th>msg</th>
+                        <th id="delbtn"> </th>
                     </tr>
                 </table>
             </div>
@@ -65,6 +66,7 @@
 <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <script>
     const tbl = document.getElementById("tbl");
+    let count = 0;
 
     function add(){
         let rw = tbl.rows.length;
@@ -99,6 +101,25 @@
                 tr.appendChild(td);
             }
         }
+
+        // 削除ボタン用の列を追加
+        let delTd = document.createElement("td");
+        let delButton = document.createElement("button");
+        delButton.textContent = "−";
+        
+        // ボタンにクリックイベントを設定
+        delButton.onclick = function() {
+            let rw = tbl.rows.length;
+            if (rw > 2){
+                tbl.deleteRow(tr.rowIndex); // 行のインデックスを元に削除
+                resetRowNumbers();
+            }
+        };
+        
+        delTd.appendChild(delButton);
+        delTd.classList.add("delete-btn");
+        tr.appendChild(delTd);
+
         tbl.appendChild(tr);
         scrollToBottom();
     }
@@ -109,6 +130,15 @@
             tbl.deleteRow(rw-1);
         }
         scrollToBottom();
+    }
+
+    function resetRowNumbers(){
+        let rows = tbl.rows;
+        for (let i=1; i<rows.length; i++){
+            let cell = rows[i].cells[0];
+            cell.textContent = i;
+            cell.setAttribute("id", "count");
+        }
     }
 
     function scrollToBottom(){
