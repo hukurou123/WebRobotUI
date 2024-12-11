@@ -6,7 +6,7 @@
 <title>connect</title>
 <link href="style.css" rel="stylesheet">
 </head>
-<body onload="add()">
+<body>
 
 <div id="wrapper">
     <main>
@@ -186,6 +186,11 @@
             $('.area:first-of-type').addClass("is-active"); // 最初の.areaにis-activeクラスを追加
         }
     });
+
+    window.onload = function(){
+        add();
+        $('#aaa').addClass("is-active"); //最初の.areaにis-activeクラスを追加
+    }
 </script>
 
 </body>

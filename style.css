@@ -64,6 +64,7 @@ button{
     color: #333333;
     border: none;
     border-radius: 4px;
+    cursor: pointer;
 }
 
 .delete-btn{
@@ -106,6 +107,7 @@ button{
     height: 280px;
     overflow: auto;
 }
+
 
 .area{
     display: none;
@@ -171,6 +173,7 @@ button{
     color: #333333;
     border: none;
     border-radius: 4px;
+    cursor: pointer;
 }
 
 #ip_button:hover{
@@ -201,6 +204,7 @@ button:active{
     bottom: 2%;
     left: 10%;
     transform: translate(-50%, -50%);
+    cursor: pointer;
 }
 
 /* #add{
