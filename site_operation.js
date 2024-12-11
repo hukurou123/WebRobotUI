@@ -1,7 +1,9 @@
 const tbl = document.getElementById("tbl");
 let count = 0;
+let keybind = [];
 
 function add(){
+    keybind[keybind.length] = Keybind;
     let rw = tbl.rows.length;
     let tr = document.createElement("tr");
     let iv = ["down", "up"];
@@ -73,6 +75,8 @@ function resetRowNumbers(){
         cell.setAttribute("id", "count");
     }
 }
+
+
 
 function scrollToBottom(){
     var obj = tbl.parentElement;
