@@ -147,7 +147,7 @@ img{
     background-color: #afccb8;
 }
 
-#val{
+#val, #key, #ivent, #topic, #massage{
     background: #FEF9F2;
     border: none;
     width: 150px;

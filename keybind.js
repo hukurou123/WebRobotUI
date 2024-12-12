@@ -1,17 +1,17 @@
 class Keybind {
-    key_add(key){
+    add_key(key){
         this.key = key;
     }
 
-    stat_add(stat){
+    add_stat(stat){
         this.stat = stat;
     }
 
-    tpc_add(tpc){
+    add_tpc(tpc){
         this.tpc = tpc;
     }
 
-    msg_add(msg){
+    add_msg(msg){
         this.msg = msg;
     }
 }

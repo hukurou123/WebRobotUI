@@ -4,38 +4,58 @@ let keybind = [];
 
 function add(){
     keybind[keybind.length] = Keybind;
+
+    //表を作るとこ
     let rw = tbl.rows.length;
     let tr = document.createElement("tr");
     let iv = ["down", "up"];
-    for(let i=0;i<5;i++){
-        if (i==0){
-            let td = document.createElement("td");
-            let p1 = document.createElement("p");
-            let text1 = document.createTextNode(rw);
-            p1.appendChild(text1);
-            td.appendChild(p1);
-            td.setAttribute("id", "count");
-            tr.appendChild(td);
-        }
-        else if (i==2){
-            let td = document.createElement("td");
-            let sl = document.createElement('select');
-            for (let num in iv){
-                let op = document.createElement('option');
-                op.text = iv[num];
-                sl.appendChild(op);
-            }
-            sl.setAttribute("id", "val");
-            td.appendChild(sl);
-            tr.appendChild(td);
-        } else {
-            let td = document.createElement("td");
-            let inp = document.createElement("input");
-            inp.setAttribute("id", "val");
-            td.appendChild(inp);
-            tr.appendChild(td);
-        }
+    
+    //行番号
+    let td1 = document.createElement("td");
+    let p1 = document.createElement("p");
+    let text1 = document.createTextNode(rw);
+    p1.appendChild(text1);
+    td1.appendChild(p1);
+    td1.setAttribute("id", "count");
+    td1.setAttribute("name", rw);
+    tr.appendChild(td1);
+
+    //キー
+    let td2 = document.createElement("td");
+    let inp1 = document.createElement("input");
+    inp1.setAttribute("id", "key");
+    td2.appendChild(inp1);
+    td2.setAttribute("name", rw);
+    tr.appendChild(td2);
+
+    //イベント
+    let td3 = document.createElement("td");
+    let sl = document.createElement('select');
+    for (let num in iv){
+        let op = document.createElement('option');
+        op.text = iv[num];
+        sl.appendChild(op);
     }
+    sl.setAttribute("id", "ivent");
+    td3.appendChild(sl);
+    td3.setAttribute("name", rw);
+    tr.appendChild(td3);
+
+    //トピック
+    let td4 = document.createElement("td");
+    let inp2 = document.createElement("input");
+    inp2.setAttribute("id", "topic");
+    td4.appendChild(inp2);
+    td4.setAttribute("name", rw);
+    tr.appendChild(td4);
+
+    //メッセージ
+    let td5 = document.createElement("td");
+    let inp3 = document.createElement("input");
+    inp3.setAttribute("id", "massage");
+    td5.appendChild(inp3);
+    td5.setAttribute("name", rw);
+    tr.appendChild(td5);
 
     // 確定ボタン用の列を追加
     let confTd = document.createElement("td");
@@ -44,9 +64,13 @@ function add(){
     confimg.src = 'フロッピーディスクアイコン1.png'
     confimg.alt = '確定';
 
+    //確定ボタンが押された時の処理
     confButton.onclick = function(){
         let rw = tbl.rows.length - 1;
-        alert(rw);
+        let key = document.getElementById('key');
+        alert(key.value);
+        // alert(tr.rowIndex);
+        // keybind[tr.rowIndex].add_key()
     }
 
     confButton.appendChild(confimg);
@@ -121,36 +145,6 @@ function GethashID (hashIDName){
         });
     }
 }
-
-// 全てのテキストフィールドを取得
-const textFields = document.querySelectorAll('input[type="text"], textarea');
-
-// 全てのテキストフィールドにフォーカスが当たっているかどうかを監視
-let isAnyFieldFocused = false;
-
-// フォーカスが外れた際の処理
-function handleFocusOut() {
-    setTimeout(() => {
-        if (!isAnyFieldFocused) {
-            alert('全てのテキストフィールドからフォーカスが外れました');
-        }
-    }, 0); // 次のフォーカスが決定されるのを待つ
-}
-
-// フォーカスが当たった場合の処理
-function handleFocusIn() {
-    isAnyFieldFocused = true; // どれかのフィールドにフォーカスがある
-}
-
-// テキストフィールドにフォーカスが当たった場合と外れた場合にイベントを設定
-textFields.forEach(field => {
-    field.addEventListener('focusin', handleFocusIn);
-    field.addEventListener('focusout', () => {
-        isAnyFieldFocused = false; // フォーカスが外れた
-        handleFocusOut();          // フォーカス外れ後の処理を実行
-    });
-});
-
 
 // タブをクリックしたら
 document.querySelectorAll('.tab a').forEach(function (tab) {
