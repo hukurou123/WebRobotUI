@@ -31,7 +31,7 @@ table th{
 }
 
 th, td{
-    width: 50px;
+    width: 20px;
     height: 20px;
 }
 
@@ -70,6 +70,16 @@ button{
 .delete-btn{
     background-color: #afccb8;
 }
+.confirmedbtn{
+    padding: 0px;
+    margin-top: 6px;
+}
+.conf-btn{
+    background-color: #afccb8;
+}
+img{
+    height: 100%;
+}
 
 .ip_input{
     font-size: 20px;
@@ -103,7 +113,7 @@ button{
 }
 
 .table{
-    width: 780px;
+    width: 850px;
     height: 280px;
     overflow: auto;
 }
@@ -124,11 +134,15 @@ button{
     animation-fill-mode: forwards;
     opacity: 1;
     padding: 50px;
-    width: 780px;
+    width: 810px;
     height: 300px;
 }
 
 #delbtn{
+    background-color: #afccb8;
+}
+#confbtn{
+    width: 5px;
     background-color: #afccb8;
 }
 
@@ -136,7 +150,7 @@ button{
     background: #FEF9F2;
     border: none;
     width: 150px;
-    height: 25px;
+    height: 30px;
     text-align: center;
 }
 

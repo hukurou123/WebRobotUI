@@ -37,6 +37,24 @@ function add(){
         }
     }
 
+    // 確定ボタン用の列を追加
+    let confTd = document.createElement("td");
+    let confButton = document.createElement("button");
+    let confimg = document.createElement("img");
+    confimg.src = 'icons8-セーブ-48.png'
+    confimg.alt = '確定';
+
+    confButton.onclick = function(){
+        let rw = tbl.rows.length - 1;
+        alert(rw);
+    }
+
+    confButton.appendChild(confimg);
+    confTd.appendChild(confButton);
+    confTd.classList.add("conf-btn");
+    confButton.classList.add("confirmedbtn");
+    tr.appendChild(confTd);
+
     // 削除ボタン用の列を追加
     let delTd = document.createElement("td");
     let delButton = document.createElement("button");
@@ -105,6 +123,36 @@ function GethashID (hashIDName){
         });
     }
 }
+
+// 全てのテキストフィールドを取得
+const textFields = document.querySelectorAll('input[type="text"], textarea');
+
+// 全てのテキストフィールドにフォーカスが当たっているかどうかを監視
+let isAnyFieldFocused = false;
+
+// フォーカスが外れた際の処理
+function handleFocusOut() {
+    setTimeout(() => {
+        if (!isAnyFieldFocused) {
+            alert('全てのテキストフィールドからフォーカスが外れました');
+        }
+    }, 0); // 次のフォーカスが決定されるのを待つ
+}
+
+// フォーカスが当たった場合の処理
+function handleFocusIn() {
+    isAnyFieldFocused = true; // どれかのフィールドにフォーカスがある
+}
+
+// テキストフィールドにフォーカスが当たった場合と外れた場合にイベントを設定
+textFields.forEach(field => {
+    field.addEventListener('focusin', handleFocusIn);
+    field.addEventListener('focusout', () => {
+        isAnyFieldFocused = false; // フォーカスが外れた
+        handleFocusOut();          // フォーカス外れ後の処理を実行
+    });
+});
+
 
 // タブをクリックしたら
 document.querySelectorAll('.tab a').forEach(function (tab) {
