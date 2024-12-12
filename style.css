@@ -72,13 +72,14 @@ button{
 }
 .confirmedbtn{
     padding: 0px;
-    margin-top: 6px;
+    
 }
 .conf-btn{
     background-color: #afccb8;
 }
 img{
-    height: 100%;
+    margin-top: 3px;
+    height: 70%;
 }
 
 .ip_input{
