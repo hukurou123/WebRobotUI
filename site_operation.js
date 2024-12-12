@@ -41,7 +41,7 @@ function add(){
     let confTd = document.createElement("td");
     let confButton = document.createElement("button");
     let confimg = document.createElement("img");
-    confimg.src = 'icons8-セーブ-48.png'
+    confimg.src = 'フロッピーディスクアイコン1.png'
     confimg.alt = '確定';
 
     confButton.onclick = function(){
@@ -93,8 +93,6 @@ function resetRowNumbers(){
         cell.setAttribute("id", "count");
     }
 }
-
-
 
 function scrollToBottom(){
     var obj = tbl.parentElement;
