@@ -16,8 +16,6 @@ class Keybind {
     }
 }
 
-
-
 document.addEventListener('keydown', event => {
     if (event.key == 'a'){
         console.log(event.key+"です");

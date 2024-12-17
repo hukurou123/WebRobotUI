@@ -1,3 +1,5 @@
+// import { Keybind } from "./keybind.js";
+
 const tbl = document.getElementById("tbl");
 let count = 0;
 let keybind = [];
@@ -70,10 +72,10 @@ function add(){
         let ivent = document.getElementById("ivent"+rw);
         let topic = document.getElementById("topic"+rw);
         let massage = document.getElementById("massage"+rw);
-        // console.log(key.value);
-        // console.log(ivent.value);
-        // console.log(topic.value);
-        // console.log(massage.value);
+        console.log(key.value);
+        console.log(ivent.value);
+        console.log(topic.value);
+        console.log(massage.value);
         // keybind[tr.rowIndex].add_key(key.value);
         // keybind[tr.rowIndex].add_ivent(ivent.value);
         // keybind[tr.rowIndex].add_topic(topic.value);
