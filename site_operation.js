@@ -16,16 +16,15 @@ function add(){
     let text1 = document.createTextNode(rw);
     p1.appendChild(text1);
     td1.appendChild(p1);
-    td1.setAttribute("id", "count");
-    td1.setAttribute("name", rw);
+    p1.setAttribute("id", "count");
     tr.appendChild(td1);
 
     //キー
     let td2 = document.createElement("td");
     let inp1 = document.createElement("input");
-    inp1.setAttribute("id", "key");
+    inp1.setAttribute("id", "key"+rw);
+    inp1.setAttribute("class", "cell");
     td2.appendChild(inp1);
-    td2.setAttribute("name", rw);
     tr.appendChild(td2);
 
     //イベント
@@ -36,25 +35,25 @@ function add(){
         op.text = iv[num];
         sl.appendChild(op);
     }
-    sl.setAttribute("id", "ivent");
+    sl.setAttribute("id", "ivent"+rw);
+    sl.setAttribute("class", "cell");
     td3.appendChild(sl);
-    td3.setAttribute("name", rw);
     tr.appendChild(td3);
 
     //トピック
     let td4 = document.createElement("td");
     let inp2 = document.createElement("input");
-    inp2.setAttribute("id", "topic");
+    inp2.setAttribute("id", "topic"+rw);
+    inp2.setAttribute("class", "cell");
     td4.appendChild(inp2);
-    td4.setAttribute("name", rw);
     tr.appendChild(td4);
 
     //メッセージ
     let td5 = document.createElement("td");
     let inp3 = document.createElement("input");
-    inp3.setAttribute("id", "massage");
+    inp3.setAttribute("id", "massage"+rw);
+    inp3.setAttribute("class", "cell");
     td5.appendChild(inp3);
-    td5.setAttribute("name", rw);
     tr.appendChild(td5);
 
     // 確定ボタン用の列を追加
@@ -67,8 +66,8 @@ function add(){
     //確定ボタンが押された時の処理
     confButton.onclick = function(){
         let rw = tbl.rows.length - 1;
-        let key = document.getElementById('key');
-        alert(key.value);
+        let key = document.getElementsByName(rw);
+        alert(key.values);
         // alert(tr.rowIndex);
         // keybind[tr.rowIndex].add_key()
     }
@@ -101,6 +100,7 @@ function add(){
     scrollToBottom();
 }
 
+//削除機能
 function del(){
     let rw = tbl.rows.length;
     if (rw > 2){
@@ -109,6 +109,7 @@ function del(){
     scrollToBottom();
 }
 
+//番号の振り直し
 function resetRowNumbers(){
     let rows = tbl.rows;
     for (let i = 1; i < rows.length; i++){
@@ -118,6 +119,7 @@ function resetRowNumbers(){
     }
 }
 
+//表を追加したら表の一番下に移動する
 function scrollToBottom(){
     var obj = tbl.parentElement;
     obj.scrollTop = obj.scrollHeight;
@@ -166,6 +168,7 @@ window.addEventListener('load', function () {
     add();
 });
 
+//ページを読み込んだ時に行を追加しaaaのタブを有効化
 window.onload = function(){
     add();
     document.querySelector('#aaa').classList.add("is-active");

@@ -147,12 +147,19 @@ img{
     background-color: #afccb8;
 }
 
-#val, #key, #ivent, #topic, #massage{
+.cell{
     background: #FEF9F2;
     border: none;
     width: 150px;
     height: 30px;
     text-align: center;
+}
+
+#count{
+    width: 40px;
+    height: 25px;
+    text-align: center;
+    background: #fef9f2;
 }
 
 #ip{
