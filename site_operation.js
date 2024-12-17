@@ -67,13 +67,17 @@ function add(){
     confButton.onclick = function(){
         let rw = tr.rowIndex;
         let key = document.getElementById("key"+rw);
+        let ivent = document.getElementById("ivent"+rw);
         let topic = document.getElementById("topic"+rw);
         let massage = document.getElementById("massage"+rw);
-        console.log(key.value);
-        console.log(topic.value);
-        console.log(massage.value);
-        // alert(tr.rowIndex);
-        // keybind[tr.rowIndex].add_key()
+        // console.log(key.value);
+        // console.log(ivent.value);
+        // console.log(topic.value);
+        // console.log(massage.value);
+        // keybind[tr.rowIndex].add_key(key.value);
+        // keybind[tr.rowIndex].add_ivent(ivent.value);
+        // keybind[tr.rowIndex].add_topic(topic.value);
+        // keybind[tr.rowIndex].add_massage(massage.value);
     }
 
     confButton.appendChild(confimg);
@@ -119,8 +123,16 @@ function resetRowNumbers(){
     let rows = tbl.rows;
     for (let i = 1; i < rows.length; i++){
         let cell = rows[i].cells[0];
+        let key = document.getElementById("key"+cell.textContent);
+        let ivent = document.getElementById("ivent"+cell.textContent);
+        let topic = document.getElementById("topic"+cell.textContent);
+        let massage = document.getElementById("massage"+cell.textContent);
         cell.textContent = i;
         cell.setAttribute("id", "count");
+        key.setAttribute("id", "key"+i);
+        ivent.setAttribute("id", "ivent"+i);
+        topic.setAttribute("id", "topic"+i);
+        massage.setAttribute("id", "massage"+i);
     }
 }
 

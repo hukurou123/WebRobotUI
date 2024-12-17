@@ -3,16 +3,16 @@ class Keybind {
         this.key = key;
     }
 
-    add_stat(stat){
-        this.stat = stat;
+    add_ivent(ivent){
+        this.ivent = ivent;
     }
 
-    add_tpc(tpc){
-        this.tpc = tpc;
+    add_topic(topic){
+        this.topic = topic;
     }
 
-    add_msg(msg){
-        this.msg = msg;
+    add_massage(massage){
+        this.massage = massage;
     }
 }
 
