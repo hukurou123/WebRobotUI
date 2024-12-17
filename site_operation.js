@@ -65,15 +65,20 @@ function add(){
 
     //確定ボタンが押された時の処理
     confButton.onclick = function(){
-        let rw = tbl.rows.length - 1;
-        let key = document.getElementsByName(rw);
-        alert(key.values);
+        let rw = tr.rowIndex;
+        let key = document.getElementById("key"+rw);
+        let topic = document.getElementById("topic"+rw);
+        let massage = document.getElementById("massage"+rw);
+        console.log(key.value);
+        console.log(topic.value);
+        console.log(massage.value);
         // alert(tr.rowIndex);
         // keybind[tr.rowIndex].add_key()
     }
 
     confButton.appendChild(confimg);
     confTd.appendChild(confButton);
+    confButton.setAttribute("id", "confButton"+rw);
     confTd.classList.add("conf-btn");
     confButton.classList.add("confirmedbtn");
     tr.appendChild(confTd);
