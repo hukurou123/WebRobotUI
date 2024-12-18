@@ -3,6 +3,7 @@ let count = 0;
 let keybind = [];
 
 function add(){
+    //インスタンスを配列内に新規作成
     keybind[keybind.length] = new Keybind();
     console.log(keybind);
 
@@ -66,22 +67,21 @@ function add(){
 
     //確定ボタンが押された時の処理
     confButton.onclick = function(){
+        //押された確定ボタンが何行目か
         let rw = tr.rowIndex;
-        let key = document.getElementById("key"+rw);
+        //押された行番目の要素を取得
+        let key = document.getElementById("key"+rw);    
         let event = document.getElementById("event"+rw);
         let topic = document.getElementById("topic"+rw);
         let massage = document.getElementById("massage"+rw);
-        console.log(key.value);
-        console.log(event.value);
-        console.log(topic.value);
-        console.log(massage.value);
-        console.log(tr.rowIndex);
+        //配列内のインスタンスに入力情報を登録
         keybind[tr.rowIndex-1].add_key(key.value);
         keybind[tr.rowIndex-1].add_event(event.value);
         keybind[tr.rowIndex-1].add_topic(topic.value);
         keybind[tr.rowIndex-1].add_massage(massage.value);
     }
 
+    //確定ボタン作成つづき
     confButton.appendChild(confimg);
     confTd.appendChild(confButton);
     confButton.setAttribute("id", "confButton"+rw);
@@ -96,13 +96,16 @@ function add(){
     
     // ボタンにクリックイベントを設定
     delButton.onclick = function() {
+        //表の長さを取得
         let rw = tbl.rows.length;
+        //表の要素が2個以上あるなら
         if (rw > 2){
             tbl.deleteRow(tr.rowIndex); // 行のインデックスを元に削除
-            resetRowNumbers();
+            resetRowNumbers();          //行番号の振り直し
         }
     };
     
+    //削除ボタン作成つづき
     delTd.appendChild(delButton);
     delTd.classList.add("delete-btn");
     tr.appendChild(delTd);
@@ -111,29 +114,26 @@ function add(){
     scrollToBottom();
 }
 
-//削除機能
-function del(){
-    let rw = tbl.rows.length;
-    if (rw > 2){
-        tbl.deleteRow(rw-1);
-    }
-    scrollToBottom();
-}
-
 //番号の振り直し
 function resetRowNumbers(){
+    //表の各番号を取得
     let rows = tbl.rows;
+    //1番目から表の最後まで
     for (let i = 1; i < rows.length; i++){
-        let cell = rows[i].cells[0];
+        let cell = rows[i].cells[0];    //行番号の要素を取得
+        //行の各入力フォームの要素を取得
         let key = document.getElementById("key"+cell.textContent);
         let event = document.getElementById("event"+cell.textContent);
         let topic = document.getElementById("topic"+cell.textContent);
         let massage = document.getElementById("massage"+cell.textContent);
+        //配列を入れ替え
         keybind[i-1] = keybind[cell.textContent-1];
+        //配列の最後の要素は削除
         if (i==rows.length-1){
             keybind.pop();
         }
-        cell.textContent = i;
+        cell.textContent = i;   //行番号を振り直し
+        //行の各入力フォームのidを振り直し
         cell.setAttribute("id", "count");
         key.setAttribute("id", "key"+i);
         event.setAttribute("id", "event"+i);
@@ -144,7 +144,9 @@ function resetRowNumbers(){
 
 //キーが押された時
 document.addEventListener('keydown', event => {
+    //配列の長さ分だけ繰り返し
     for (let i=0; i<tbl.rows.length-1; i++){
+        //押されたキーが配列に登録されているなら
         if (event.key == keybind[i].get_key()){
             console.log(event.key+"です");
         }
