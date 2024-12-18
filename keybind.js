@@ -21,19 +21,19 @@ class Keybind {
         this.massage = massage;
     }
 
-    get_key(key){
-        return key;
+    get_key(){
+        return this.key;
     }
 
-    get_event(event){
-        return event;
+    get_event(){
+        return this.event;
     }
 
-    get_topic(topic){
-        return topic;
+    get_topic(){
+        return this.topic;
     }
 
-    get_massage(massage){
-        return massage;
+    get_massage(){
+        return this.massage;
     }
 }

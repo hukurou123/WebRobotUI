@@ -139,13 +139,12 @@ function resetRowNumbers(){
 }
 
 //キーが押された時
-function keyDown(){
-    document.addEventListener('keydown', event => {
-        if (event.key == keybind[1].get_key){
-            console.log(event.key+"です");
-        }
-    })
-}
+document.addEventListener('keydown', event => {
+    if (event.key == keybind[0].get_key()){
+        console.log(event.key+"です");
+    }
+})
+
 
 //表を追加したら表の一番下に移動する
 function scrollToBottom(){
