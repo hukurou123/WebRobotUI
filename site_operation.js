@@ -1,11 +1,10 @@
-// import { Keybind } from "./keybind.js";
-
 const tbl = document.getElementById("tbl");
 let count = 0;
 let keybind = [];
 
 function add(){
-    keybind[keybind.length] = Keybind;
+    keybind[keybind.length] = new Keybind();
+    console.log(keybind);
 
     //表を作るとこ
     let rw = tbl.rows.length;
@@ -37,7 +36,7 @@ function add(){
         op.text = iv[num];
         sl.appendChild(op);
     }
-    sl.setAttribute("id", "ivent"+rw);
+    sl.setAttribute("id", "event"+rw);
     sl.setAttribute("class", "cell");
     td3.appendChild(sl);
     tr.appendChild(td3);
@@ -69,17 +68,18 @@ function add(){
     confButton.onclick = function(){
         let rw = tr.rowIndex;
         let key = document.getElementById("key"+rw);
-        let ivent = document.getElementById("ivent"+rw);
+        let event = document.getElementById("event"+rw);
         let topic = document.getElementById("topic"+rw);
         let massage = document.getElementById("massage"+rw);
         console.log(key.value);
-        console.log(ivent.value);
+        console.log(event.value);
         console.log(topic.value);
         console.log(massage.value);
-        // keybind[tr.rowIndex].add_key(key.value);
-        // keybind[tr.rowIndex].add_ivent(ivent.value);
-        // keybind[tr.rowIndex].add_topic(topic.value);
-        // keybind[tr.rowIndex].add_massage(massage.value);
+        console.log(tr.rowIndex);
+        keybind[tr.rowIndex-1].add_key(key.value);
+        keybind[tr.rowIndex-1].add_event(event.value);
+        keybind[tr.rowIndex-1].add_topic(topic.value);
+        keybind[tr.rowIndex-1].add_massage(massage.value);
     }
 
     confButton.appendChild(confimg);
@@ -126,16 +126,25 @@ function resetRowNumbers(){
     for (let i = 1; i < rows.length; i++){
         let cell = rows[i].cells[0];
         let key = document.getElementById("key"+cell.textContent);
-        let ivent = document.getElementById("ivent"+cell.textContent);
+        let event = document.getElementById("event"+cell.textContent);
         let topic = document.getElementById("topic"+cell.textContent);
         let massage = document.getElementById("massage"+cell.textContent);
         cell.textContent = i;
         cell.setAttribute("id", "count");
         key.setAttribute("id", "key"+i);
-        ivent.setAttribute("id", "ivent"+i);
+        event.setAttribute("id", "event"+i);
         topic.setAttribute("id", "topic"+i);
         massage.setAttribute("id", "massage"+i);
     }
+}
+
+//キーが押された時
+function keyDown(){
+    document.addEventListener('keydown', event => {
+        if (event.key == keybind[1].get_key){
+            console.log(event.key+"です");
+        }
+    })
 }
 
 //表を追加したら表の一番下に移動する

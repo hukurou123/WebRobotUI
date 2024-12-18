@@ -1,10 +1,16 @@
 class Keybind {
+    key;
+    event;
+    topic;
+    massage;
+
     add_key(key){
         this.key = key;
+        console.log("keyが追加されました");
     }
 
-    add_ivent(ivent){
-        this.ivent = ivent;
+    add_event(event){
+        this.event = event;
     }
 
     add_topic(topic){
@@ -14,10 +20,20 @@ class Keybind {
     add_massage(massage){
         this.massage = massage;
     }
-}
 
-document.addEventListener('keydown', event => {
-    if (event.key == 'a'){
-        console.log(event.key+"です");
+    get_key(key){
+        return key;
     }
-})
+
+    get_event(event){
+        return event;
+    }
+
+    get_topic(topic){
+        return topic;
+    }
+
+    get_massage(massage){
+        return massage;
+    }
+}
