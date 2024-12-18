@@ -129,6 +129,10 @@ function resetRowNumbers(){
         let event = document.getElementById("event"+cell.textContent);
         let topic = document.getElementById("topic"+cell.textContent);
         let massage = document.getElementById("massage"+cell.textContent);
+        keybind[i-1] = keybind[cell.textContent-1];
+        if (i==rows.length-1){
+            keybind.pop();
+        }
         cell.textContent = i;
         cell.setAttribute("id", "count");
         key.setAttribute("id", "key"+i);
