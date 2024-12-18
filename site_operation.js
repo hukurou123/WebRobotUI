@@ -140,8 +140,10 @@ function resetRowNumbers(){
 
 //キーが押された時
 document.addEventListener('keydown', event => {
-    if (event.key == keybind[0].get_key()){
-        console.log(event.key+"です");
+    for (let i=0; i<tbl.rows.length-1; i++){
+        if (event.key == keybind[i].get_key()){
+            console.log(event.key+"です");
+        }
     }
 })
 
