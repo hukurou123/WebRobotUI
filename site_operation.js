@@ -147,7 +147,19 @@ document.addEventListener('keydown', event => {
     //配列の長さ分だけ繰り返し
     for (let i=0; i<tbl.rows.length-1; i++){
         //押されたキーが配列に登録されているなら
-        if (event.key == keybind[i].get_key()){
+        if (event.key == keybind[i].get_key() && keybind[i].get_event()=="down"){
+            // console.log(event.key+"です");
+            client.publish(keybind[i].get_topic(), keybind[i].get_massage());
+        }
+    }
+})
+
+//キーが離された時
+document.addEventListener('keyup', event => {
+    //配列の長さ分だけ繰り返し
+    for (let i=0; i<tbl.rows.length-1; i++){
+        //押されたキーが配列に登録されているなら
+        if (event.key == keybind[i].get_key() && keybind[i].get_event()=="up"){
             // console.log(event.key+"です");
             client.publish(keybind[i].get_topic(), keybind[i].get_massage());
         }
