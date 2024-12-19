@@ -149,6 +149,8 @@ document.addEventListener('keydown', event => {
         //押されたキーが配列に登録されているなら
         if (event.key == keybind[i].get_key()){
             console.log(event.key+"です");
+            console.log('onClick');
+            client.publish('mqtt/demo', 'hello world!');
         }
     }
 })

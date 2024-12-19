@@ -1,26 +1,10 @@
-const mqtt = require('mqtt');
+// var client = mqtt.connect('ws://broker.emqx.io:8083/mqtt');
+var client = mqtt.connect('ws://192.168.1.120:8081/mqtt');
 
-const url = 'ws://broker.emqx.io:8083/mqtt'
-
-const options = {
-    clean: true,
-    connectTimeout: 4000,
-    clientId: 'emqx_test',
-    username: 'emqx_test',
-    password: 'emqx_test',
-}
-const client = mqtt.connect(url, options);
-
-client.on('connect', function() {
-    console.log('Connected');
-    client.subscribe('test', function(err){
-        if(!err){
-            client.publish('test', 'Hello mqtt');
-        }
-    })
-})
-
-client.on('massage', function(topic, massage) {
-    console.log(massage.toString())
-    client.end()
-})
+client.on('connect', () => {
+    console.log('connected');
+    client.subscribe('test');
+});
+client.on('massage', (topic, massage) => {
+    console.log(topic + ':' + massage);
+});
