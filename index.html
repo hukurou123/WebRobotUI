@@ -5,8 +5,6 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>connect</title>
 <link href="style.css" rel="stylesheet">
-<link href="phone.css" rel="stylesheet">
-<link href="tablet.css" rel="stylesheet">
 <meta-viewport content="width=device-width,initial-scale=1.0,minimum-scale1.0">
 <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 </head>
@@ -20,7 +18,7 @@
             <input type="text" id="ip_name" name="ip_name" size="20" value="192.168.1.1">
             <label for="port_name" id="ip"> : </label>
             <input type="text" id="port_name" name="ip_name" size="10" value="8080">
-            <input type="button" id="ip_button" value="connect">
+            <input type="button" id="ip_button" value="connect" onclick="ConnectButtonClick()">
         </div>
         <ul class="tab">
             <li><a href="#key">key</a></li>

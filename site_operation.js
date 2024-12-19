@@ -148,7 +148,7 @@ document.addEventListener('keydown', event => {
     for (let i=0; i<tbl.rows.length-1; i++){
         //押されたキーが配列に登録されているなら
         if (event.key == keybind[i].get_key()){
-            console.log(event.key+"です");
+            // console.log(event.key+"です");
             client.publish(keybind[i].get_topic(), keybind[i].get_massage());
         }
     }
