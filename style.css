@@ -188,6 +188,25 @@
         border-bottom: 2px solid #212b33;
     }
     
+    #port_name{
+        width: 70px;
+        height: 20px;
+        font-size: 20px;
+        text-align: right;
+        background-color: #FEF9F2;
+        color: #333333;
+        border: none;
+        border-radius: 3px;
+        margin-top: 14px;
+        margin-right: 9px;
+    }
+
+    #port_name:focus{
+        outline: none;
+        border: none;
+        border-bottom: 2px solid #212b33;
+    }
+
     #ip_button{
         width: 70px;
         height: 26px;

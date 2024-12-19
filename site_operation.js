@@ -149,8 +149,7 @@ document.addEventListener('keydown', event => {
         //押されたキーが配列に登録されているなら
         if (event.key == keybind[i].get_key()){
             console.log(event.key+"です");
-            console.log('onClick');
-            client.publish('mqtt/demo', 'hello world!');
+            client.publish(keybind[i].get_topic(), keybind[i].get_massage());
         }
     }
 })
@@ -208,5 +207,5 @@ window.addEventListener('load', function () {
 //ページを読み込んだ時に行を追加しaaaのタブを有効化
 window.onload = function(){
     add();
-    document.querySelector('#aaa').classList.add("is-active");
+    document.querySelector('#key').classList.add("is-active");
 }
