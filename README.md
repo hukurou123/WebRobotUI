@@ -1,0 +1,3 @@
+# MQTT.jsを使ったMQTT通信を補助するwebサイト
+
+keyとtopic,massageを設定すると，設定したkeyを押すと設定したtopicに設定したmassageが送られる．
