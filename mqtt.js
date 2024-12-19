@@ -9,6 +9,12 @@ function ConnectButtonClick() {
         console.log('connected');
         client.subscribe('test');
     });
+
+    client.on('error', (error) => {
+        console.error('Connection failed:', error);
+        alert("接続に失敗しました(´Д`; )");
+        client.end();
+    })
 }
 
 client.on('massage', (topic, massage) => {
