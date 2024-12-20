@@ -81,6 +81,7 @@ function add(){
         keybind[index].add_topic(topic.value);
         keybind[index].add_massage(massage.value);
         keybind[index].change_json(index);
+        keybind[index].get_json(index);
     }
 
     //確定ボタン作成つづき
@@ -222,4 +223,26 @@ window.addEventListener('load', function () {
 window.onload = function(){
     add();
     document.querySelector('#key').classList.add("is-active");
+    for (let i=0; i<localStorage.length; i++){
+        let j=i+1;
+        let key = document.getElementById("key"+j);    
+        let event = document.getElementById("event"+j);
+        let topic = document.getElementById("topic"+j);
+        let massage = document.getElementById("massage"+j);
+        let jsonObj = localStorage.getItem(i);
+        let jsObj = JSON.parse(jsonObj);
+        keybind[i].add_key(jsObj.key);
+        keybind[i].add_event(jsObj.event);
+        keybind[i].add_topic(jsObj.topic);
+        keybind[i].add_massage(jsObj.massage);
+        key.value = keybind[i].get_key();
+        if (keybind[i].get_event() == "down"){
+            event.options[0].selected = true;
+        }else if(keybind[i].get_event() == "up"){
+            event.options[1].selected = true;
+        }
+        topic.value = keybind[i].get_topic();
+        massage.value = keybind[i].get_massage();
+        add();
+    }
 }

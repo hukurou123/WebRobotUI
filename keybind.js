@@ -51,6 +51,7 @@ class Keybind {
     get_json(rw){
         let jsonObj = localStorage.getItem(rw);
         let jsObj = JSON.parse(jsonObj);
-        console.log(jsObj);
+        // console.log(jsObj);
+        return jsObj;
     }
 }
