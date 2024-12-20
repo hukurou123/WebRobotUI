@@ -36,4 +36,21 @@ class Keybind {
     get_massage(){
         return this.massage;
     }
+
+    change_json(rw){
+        let objlist = {
+            key : this.key,
+            event : this.event,
+            topic : this.topic,
+            massage : this.massage
+        };
+        let obj = JSON.stringify(objlist);
+        localStorage.setItem(rw, obj);
+    }
+
+    get_json(rw){
+        let jsonObj = localStorage.getItem(rw);
+        let jsObj = JSON.parse(jsonObj);
+        console.log(jsObj);
+    }
 }

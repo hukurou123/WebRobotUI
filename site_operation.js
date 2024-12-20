@@ -69,16 +69,18 @@ function add(){
     confButton.onclick = function(){
         //押された確定ボタンが何行目か
         let rw = tr.rowIndex;
+        let index = tr.rowIndex-1;
         //押された行番目の要素を取得
         let key = document.getElementById("key"+rw);    
         let event = document.getElementById("event"+rw);
         let topic = document.getElementById("topic"+rw);
         let massage = document.getElementById("massage"+rw);
         //配列内のインスタンスに入力情報を登録
-        keybind[tr.rowIndex-1].add_key(key.value);
-        keybind[tr.rowIndex-1].add_event(event.value);
-        keybind[tr.rowIndex-1].add_topic(topic.value);
-        keybind[tr.rowIndex-1].add_massage(massage.value);
+        keybind[index].add_key(key.value);
+        keybind[index].add_event(event.value);
+        keybind[index].add_topic(topic.value);
+        keybind[index].add_massage(massage.value);
+        keybind[index].change_json(index);
     }
 
     //確定ボタン作成つづき
