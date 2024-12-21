@@ -131,10 +131,6 @@ function resetRowNumbers(){
         let massage = document.getElementById("massage"+cell.textContent);
         //配列を入れ替え
         keybind[i-1] = keybind[cell.textContent-1];
-        //配列の最後の要素は削除
-        if (i==rows.length-1){
-            keybind.pop();
-        }
         cell.textContent = i;   //行番号を振り直し
         //行の各入力フォームのidを振り直し
         cell.setAttribute("id", "count");
@@ -143,6 +139,19 @@ function resetRowNumbers(){
         topic.setAttribute("id", "topic"+i);
         massage.setAttribute("id", "massage"+i);
     }
+    keybind.pop();
+    for (let i=0; i<keybind.length; i++){
+        if (isEmpty(keybind[i])){
+            localStorage.removeItem(i);
+            continue;
+        }
+        localStorage.setItem(i, JSON.stringify(keybind[i]));
+        console.log(i, keybind[i]);
+    }
+}
+
+const isEmpty = (obj) => {
+    return JSON.stringify(obj) === "{}";
 }
 
 //キーが押された時
