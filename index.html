@@ -15,11 +15,13 @@
     <main>
         
         <div class="ip_input">
+            <img src="./red.PNG" id="status" alt="status" width="20px" height="20px">
             <label for="ip_name" id="ip">Broker IP</label>
             <input type="text" id="ip_name" name="ip_name" size="20" value="192.168.1.1">
             <label for="port_name" id="ip"> : </label>
             <input type="text" id="port_name" name="ip_name" size="10" value="8080">
             <input type="button" id="ip_button" value="connect" onclick="ConnectButtonClick()">
+            <input type="button" id="disconnect_button" value="disconnect" onclick="disConnectButtonClick()">
         </div>
         <ul class="tab">
             <li><a href="#key">key</a></li>

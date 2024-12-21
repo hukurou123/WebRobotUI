@@ -8,15 +8,15 @@ function ConnectButtonClick() {
     client.on('connect', () => {
         localStorage.setItem("BrokerIP", ipName.value);
         localStorage.setItem("BrokerPORT", portName.value);
+        document.getElementById("status").src = "./green.PNG";
         console.log('connected');
         client.subscribe('test');
     });
+}
 
-    client.on('error', (error) => {
-        console.error('Connection failed:', error);
-        alert("接続に失敗しました(´Д`; )");
-        client.end();
-    })
+function disConnectButtonClick(){
+    client.end();
+    document.getElementById("status").src = "./red.PNG";
 }
 
 client.on('massage', (topic, massage) => {
