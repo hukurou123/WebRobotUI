@@ -6,6 +6,8 @@ function ConnectButtonClick() {
     let portName = document.getElementById("port_name");
     client = mqtt.connect('ws://'+ipName.value+':'+portName.value+'/mqtt');
     client.on('connect', () => {
+        localStorage.setItem("BrokerIP", ipName.value);
+        localStorage.setItem("BrokerPORT", portName.value);
         console.log('connected');
         client.subscribe('test');
     });

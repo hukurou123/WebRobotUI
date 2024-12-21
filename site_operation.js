@@ -234,6 +234,12 @@ window.addEventListener('load', function () {
 window.onload = function(){
     add();
     document.querySelector('#key').classList.add("is-active");
+    if (localStorage.hasOwnProperty("BrokerIP")&&localStorage.hasOwnProperty("BrokerPORT")){
+        let ipName = document.getElementById("ip_name");
+        let portName = document.getElementById("port_name");
+        ipName.value = localStorage.getItem("BrokerIP");
+        portName.value = localStorage.getItem("BrokerPORT");
+    }
     for (let i=0; i<localStorage.length; i++){
         let j=i+1;
         let key = document.getElementById("key"+j);    
