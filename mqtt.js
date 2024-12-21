@@ -9,6 +9,9 @@ function ConnectButtonClick() {
         localStorage.setItem("BrokerIP", ipName.value);
         localStorage.setItem("BrokerPORT", portName.value);
         document.getElementById("status").src = "./green.PNG";
+        document.getElementById("ip_button").classList.add("active");
+        document.getElementById("disconnect_button").classList.remove("active");
+        
         console.log('connected');
         client.subscribe('test');
     });
@@ -16,6 +19,8 @@ function ConnectButtonClick() {
 
 function disConnectButtonClick(){
     client.end();
+    document.getElementById("ip_button").classList.remove("active");
+        document.getElementById("disconnect_button").classList.add("active");
     document.getElementById("status").src = "./red.PNG";
 }
 
