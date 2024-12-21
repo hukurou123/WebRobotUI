@@ -148,6 +148,8 @@ function resetRowNumbers(){
         localStorage.setItem(i, JSON.stringify(keybind[i]));
         console.log(i, keybind[i]);
     }
+    console.log(keybind.length);
+    localStorage.removeItem(keybind.length);
 }
 
 const isEmpty = (obj) => {
