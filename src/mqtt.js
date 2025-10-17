@@ -28,3 +28,36 @@ client.on('massage', (topic, massage) => {
     console.log(topic + ':' + massage);
 });
 
+
+// JSONに登録されているかどうかを確認する変数
+const isEmpty = (obj) => {
+    return JSON.stringify(obj) === "{}";
+}
+
+
+// 登録されたキーが押された時MQTT通信する
+document.addEventListener('keydown', event => {
+    //配列の長さ分だけ繰り返し
+    for (let i=0; i<tbl.rows.length-1; i++){
+        //押されたキーが配列に登録されているなら
+        if (event.key == keybind[i].get_key() && keybind[i].get_event()=="down"){
+            // console.log(event.key+"です");
+            client.publish(keybind[i].get_topic(), keybind[i].get_massage());
+        }
+    }
+})
+
+
+// 登録されたキーが離された時MQTT通信する
+document.addEventListener('keyup', event => {
+    //配列の長さ分だけ繰り返し
+    for (let i=0; i<tbl.rows.length-1; i++){
+        //押されたキーが配列に登録されているなら
+        if (event.key == keybind[i].get_key() && keybind[i].get_event()=="up"){
+            // console.log(event.key+"です");
+            client.publish(keybind[i].get_topic(), keybind[i].get_massage());
+        }
+    }
+})
+
+
