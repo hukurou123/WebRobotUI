@@ -32,8 +32,7 @@ table th{
 }
 
 th, td{
-    width: 20px;
-    height: 20px;
+    height: 30px;
 }
 
 th{
@@ -73,7 +72,6 @@ button{
 }
 .confirmedbtn{
     padding: 0px;
-    
 }
 .conf-btn{
     background-color: #afccb8;
@@ -254,12 +252,26 @@ img{
     width: 50px;
 }
 
+.count{
+    width: 50px;
+    text-align: center;
+}
+
+.cell{
+    box-sizing: border-box;
+}
+
 button:hover{
     background: #ccc8c2;
 }
 
 button:active{
     background: #999691;
+}
+
+.delete-disabled{
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 #add_del_button{

@@ -5,164 +5,185 @@
 
 
 const tbl = document.getElementById("tbl");
-let count = 0;
 var keybind = [];
 
 // 行を追加する関数
 function add(){
-    //インスタンスを配列内に新規作成
-    keybind[keybind.length] = new Keybind();
-    console.log(keybind);
+    keybind.push(new Keybind());
+    renderTable();
+}
 
-    //表を作るとこ
-    let rw = tbl.rows.length;
-    let tr = document.createElement("tr");
-    let iv = ["down", "up"];
-    
-    //行番号
-    let td1 = document.createElement("td");
-    let p1 = document.createElement("p");
-    let text1 = document.createTextNode(rw);
-    p1.appendChild(text1);
-    td1.appendChild(p1);
-    p1.setAttribute("id", "count");
-    tr.appendChild(td1);
+// 行を削除する関数
+function remove(index){
+    // remove the element and persist
+    if (index < 0 || index >= keybind.length) return;
+    keybind.splice(index, 1);
+    // ensure at least one empty row remains
+    if (keybind.length === 0) keybind.push(new Keybind());
+    saveKeybinds();
+    renderTable();
+}
 
-    //キー
-    let td2 = document.createElement("td");
-    let inp1 = document.createElement("input");
-    inp1.setAttribute("id", "key"+rw);
-    inp1.setAttribute("class", "cell");
-    td2.appendChild(inp1);
-    tr.appendChild(td2);
-
-    //イベント
-    let td3 = document.createElement("td");
-    let sl = document.createElement('select');
-    for (let num in iv){
-        let op = document.createElement('option');
-        op.text = iv[num];
-        sl.appendChild(op);
-    }
-    sl.setAttribute("id", "event"+rw);
-    sl.setAttribute("class", "cell");
-    td3.appendChild(sl);
-    tr.appendChild(td3);
-
-    //トピック
-    let td4 = document.createElement("td");
-    let inp2 = document.createElement("input");
-    inp2.setAttribute("id", "topic"+rw);
-    inp2.setAttribute("class", "cell");
-    td4.appendChild(inp2);
-    tr.appendChild(td4);
-
-    //メッセージ
-    let td5 = document.createElement("td");
-    let inp3 = document.createElement("input");
-    inp3.setAttribute("id", "massage"+rw);
-    inp3.setAttribute("class", "cell");
-    td5.appendChild(inp3);
-    tr.appendChild(td5);
-
-    // 確定ボタン用の列を追加
-    let confTd = document.createElement("td");
-    let confButton = document.createElement("button");
-    let confimg = document.createElement("img");
-    confimg.src = 'フロッピーディスクアイコン1.png'
-    confimg.alt = '確定';
-
-    //確定ボタンが押された時の処理
-    confButton.onclick = function(){
-        //押された確定ボタンが何行目か
-        let rw = tr.rowIndex;
-        let index = tr.rowIndex-1;
-        //押された行番目の要素を取得
-        let key = document.getElementById("key"+rw);    
-        let event = document.getElementById("event"+rw);
-        let topic = document.getElementById("topic"+rw);
-        let massage = document.getElementById("massage"+rw);
-        //配列内のインスタンスに入力情報を登録
-        keybind[index].add_key(key.value);
-        keybind[index].add_event(event.value);
-        keybind[index].add_topic(topic.value);
-        keybind[index].add_massage(massage.value);
-        keybind[index].change_json(index);
-        keybind[index].get_json(index);
+function renderTable(){
+    // 表の初期化
+    while (tbl.rows.length > 1) {
+        tbl.deleteRow(1);
     }
 
-    //確定ボタン作成つづき
-    confButton.appendChild(confimg);
-    confTd.appendChild(confButton);
-    confButton.setAttribute("id", "confButton"+rw);
-    confTd.classList.add("conf-btn");
-    confButton.classList.add("confirmedbtn");
-    tr.appendChild(confTd);
+    keybind.forEach((bind, i) => {
+        const tr = document.createElement("tr");
 
-    // 削除ボタン用の列を追加
-    let delTd = document.createElement("td");
-    let delButton = document.createElement("button");
-    delButton.textContent = "−";
-    
-    // ボタンにクリックイベントを設定
-    delButton.onclick = function() {
-        //表の長さを取得
-        let rw = tbl.rows.length;
-        //表の要素が2個以上あるなら
-        if (rw > 2){
-            tbl.deleteRow(tr.rowIndex); // 行のインデックスを元に削除
-            resetRowNumbers();          //行番号の振り直し
-        }
-    };
-    
-    //削除ボタン作成つづき
-    delTd.appendChild(delButton);
-    delTd.classList.add("delete-btn");
-    tr.appendChild(delTd);
+        // 行番号
+        const tdIndex = document.createElement("td");
+        tdIndex.textContent = i + 1;
+        tdIndex.classList.add('count');
+        tr.appendChild(tdIndex);
 
-    tbl.appendChild(tr);
+        // キー
+        const tdKey = document.createElement("td");
+        const inpKey = document.createElement("input");
+        inpKey.id = `key${i}`;
+        inpKey.classList.add("cell");
+        inpKey.value = bind.get_key() || "";
+        tdKey.appendChild(inpKey);
+        tr.appendChild(tdKey);
+
+        // イベント
+        const tdEvent = document.createElement("td");
+        const sl = document.createElement('select');
+        ["down" , "up"].forEach(opt => {
+            const option = document.createElement('option');
+            option.text = opt;
+            if (bind.get_event() === opt) option.selected = true;
+            sl.appendChild(option);
+        });
+        sl.id = `event${i}`;
+        sl.classList.add("cell");
+        tdEvent.appendChild(sl);
+        tr.appendChild(tdEvent);
+
+        // トピック
+        const tdTopic = document.createElement("td");
+        const inpTopic = document.createElement("input");
+        inpTopic.id = `topic${i}`;
+        inpTopic.classList.add("cell");
+        inpTopic.value = bind.get_topic() || "";
+        tdTopic.appendChild(inpTopic);
+        tr.appendChild(tdTopic);
+
+        // メッセージ
+        const tdMsg = document.createElement("td");
+        const inpMsg = document.createElement("input");
+        inpMsg.id = `massage${i}`;
+        inpMsg.classList.add("cell");
+        inpMsg.value = bind.get_massage() || "";
+        tdMsg.appendChild(inpMsg);
+        tr.appendChild(tdMsg);
+
+        // 確定ボタン
+        const tdSave = document.createElement("td");
+        const btnSave = document.createElement("button");
+        const img = document.createElement("img");
+        img.src = 'フロッピーディスクアイコン1.png';
+        img.alt = '確定';
+        btnSave.appendChild(img);
+        tdSave.classList.add('conf-btn');
+        btnSave.onclick = () => {
+            bind.add_key(inpKey.value);
+            bind.add_event(sl.value);
+            bind.add_topic(inpTopic.value);
+            bind.add_massage(inpMsg.value);
+            bind.change_json(i);
+            bind.get_json(i);
+            saveKeybinds();
+        };
+        tdSave.appendChild(btnSave);
+        tr.appendChild(tdSave);
+
+        // 削除ボタン
+        const tdDel = document.createElement("td");
+        const btnDel = document.createElement("button");
+        btnDel.textContent = "−";
+        tdDel.classList.add('delete-btn');
+        btnDel.onclick = () => remove(i);
+        tdDel.appendChild(btnDel);
+        tr.appendChild(tdDel);
+
+        tbl.appendChild(tr);
+    });
+
     scrollToBottom();
 }
 
-
-//番号の振り直しをする関数
-function resetRowNumbers(){
-    //表の各番号を取得
-    let rows = tbl.rows;
-    //1番目から表の最後まで
-    for (let i = 1; i < rows.length; i++){
-        let cell = rows[i].cells[0];    //行番号の要素を取得
-        //行の各入力フォームの要素を取得
-        let key = document.getElementById("key"+cell.textContent);
-        let event = document.getElementById("event"+cell.textContent);
-        let topic = document.getElementById("topic"+cell.textContent);
-        let massage = document.getElementById("massage"+cell.textContent);
-        //配列を入れ替え
-        keybind[i-1] = keybind[cell.textContent-1];
-        cell.textContent = i;   //行番号を振り直し
-        //行の各入力フォームのidを振り直し
-        cell.setAttribute("id", "count");
-        key.setAttribute("id", "key"+i);
-        event.setAttribute("id", "event"+i);
-        topic.setAttribute("id", "topic"+i);
-        massage.setAttribute("id", "massage"+i);
+// localStrage操作
+function saveKeybinds(){
+    const arr = keybind.map(k => ({ key: k.get_key(), event: k.get_event(), topic: k.get_topic(), massage: k.get_massage() }));
+    const toRemove = [];
+    for (let i = 0; i < localStorage.length; i++){
+        const k = localStorage.key(i);
+        if (!k) continue;
+        if (/^[0-9]+$/.test(k)) toRemove.push(k);
     }
-    keybind.pop();
-    for (let i=0; i<keybind.length; i++){
-        if (isEmpty(keybind[i])){
-            localStorage.removeItem(i);
-            continue;
-        }
-        localStorage.setItem(i, JSON.stringify(keybind[i]));
-        console.log(i, keybind[i]);
-    }
-    console.log(keybind.length);
-    localStorage.removeItem(keybind.length);
+    toRemove.forEach(k => localStorage.removeItem(k));
+    localStorage.setItem('keybinds', JSON.stringify(arr));
 }
 
+function loadKeybinds(){
+    const data = localStorage.getItem('keybinds');
+    if (data) {
+        try {
+            const parsed = JSON.parse(data);
+            if (Array.isArray(parsed)){
+                keybind = parsed.map(obj => {
+                    const kb = new Keybind();
+                    kb.add_key(obj.key);
+                    kb.add_event(obj.event);
+                    kb.add_topic(obj.topic);
+                    kb.add_massage(obj.massage);
+                    return kb;
+                });
+                if (keybind.length === 0) keybind.push(new Keybind());
+                return;
+            }
+        } catch(e){
+            console.error('failed to parse keybinds', e);
+        }
+    }
 
-//表を追加したら表の一番下に移動する
+    keybind = [];
+    const numericKeys = [];
+    for (let i = 0; i < localStorage.length; i++){
+        const k = localStorage.key(i);
+        if (!k) continue;
+        if (k === 'BrokerIP' || k === 'BrokerPORT' || k === 'keybinds') continue;
+        if (!/^[0-9]+$/.test(k)) continue;
+        numericKeys.push(k);
+    }
+    numericKeys.sort((a,b) => Number(a) - Number(b));
+    for (const k of numericKeys){
+        try{
+            const jsObj = JSON.parse(localStorage.getItem(k));
+            const kb = new Keybind();
+            kb.add_key(jsObj.key);
+            kb.add_event(jsObj.event);
+            kb.add_topic(jsObj.topic);
+            kb.add_massage(jsObj.massage);
+            keybind.push(kb);
+        } catch(e){
+            // ignore parse errors
+        }
+    }
+    if (keybind.length === 0) keybind.push(new Keybind());
+}
+
+// スクロール
 function scrollToBottom(){
-    var obj = tbl.parentElement;
+    const obj = tbl.parentElement;
     obj.scrollTop = obj.scrollHeight;
 }
+
+// 初期化
+window.onload = () => {
+    loadKeybinds();
+    renderTable();
+};
