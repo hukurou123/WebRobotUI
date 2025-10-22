@@ -27,8 +27,8 @@
         </div>
         <ul class="tab">
             <li><a href="#key">key</a></li>
-            <li><a href="#iii">iii</a></li>
-            <li><a href="#uuu">uuu</a></li>
+            <li><a href="#GamePad">Pad</a></li>
+            <li><a href="#Touch">Touch</a></li>
         </ul>
             
         <div id="key" class="area">
@@ -47,24 +47,55 @@
             </div>
             <div id="add_del_button">
                 <button id="add" onclick="add()">+</button>
-                <!-- <button id="del" onclick="del()">−</button> -->
+                <!-- <button id="del" onclick="del()">∁E/button> -->
             </div>
         </div>
-        <div id="iii" class="area">
-            <h2>どんぐり</h2>
+        <div id="GamePad" class="area">
+            <h2>Game Pad</h2>
             <ul>
                 <li>まつぼっくり</li>
                 <li>くるみ</li>
                 <li>くこのみ</li>
             </ul>
         </div>
-        <div id="uuu" class="area">
-            <h2>だいなそー</h2>
-            <ul>
-                <li>てぃらの</li>
-                <li>すぴの</li>
-                <li>とりけら</li>
-            </ul>
+        <div id="Touch" class="area">
+            <div class="touchpad-header">
+                <button id="tp_toggle" class="tp-toggle" title="切り替え">操作</button>
+                <h2>TouchPad</h2>
+            </div>
+
+            <!-- Settings View -->
+            <div id="tp_settings" class="tp-view is-active">
+                <div class="table">
+                    <table id="tp_tbl">
+                        <tr>
+                            <th> </th>
+                            <th>button</th>
+                            <th>event</th> 
+                            <th>topic</th> 
+                            <th>massage</th>
+                            <th id="tp_confbtn"> </th>
+                            <th id="tp_delbtn"> </th>
+                        </tr>
+                    </table>
+                </div>
+                <div id="tp_add_del_button">
+                    <button id="tp_add" onclick="tpAdd()">+</button>
+                </div>
+            </div>
+
+            <!-- Operation View -->
+            <div id="tp_operate" class="tp-view">
+                <div class="dpad">
+                    <button class="dpad-btn up" id="tp_up" data-button="Up">▲</button>
+                    <div class="middle-row">
+                        <button class="dpad-btn left" id="tp_left" data-button="Left">◀</button>
+                        <div class="center-spacer"></div>
+                        <button class="dpad-btn right" id="tp_right" data-button="Right">▶</button>
+                    </div>
+                    <button class="dpad-btn down" id="tp_down" data-button="Down">▼</button>
+                </div>
+            </div>
         </div>
     </main>
 
@@ -76,6 +107,7 @@
 <script src="./keybind.js"></script>
 <script src="mqtt.js"></script>
 <script src="./site_operation.js"></script>
+<script src="./touchpad.js"></script>
 
 </body>
 </html>
