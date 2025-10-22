@@ -22,7 +22,7 @@ function remove(index){
     // リストが空になったら空行を追加
     if (keybind.length === 0) keybind.push(new Keybind());
 
-    saveKeybinds();
+    // saveKeybinds();
     renderTable();
 }
 
@@ -86,29 +86,6 @@ function renderTable(){
         tdMsg.appendChild(inpMsg);
         tr.appendChild(tdMsg);
 
-        // 確定ボタン
-        const tdSave = document.createElement("td");
-        const btnSave = document.createElement("button");
-        const img = document.createElement("img");
-        img.src = 'フロッピーディスクアイコン1.png';
-        img.alt = '確定';
-        btnSave.appendChild(img);
-        // 確定ボタンの角を丸くしたいから,tdを背景色にするためのクラスづけ
-        tdSave.classList.add('conf-btn');
-        btnSave.onclick = () => {
-            bind.add_key(inpKey.value);
-            bind.add_event(sl.value);
-            bind.add_topic(inpTopic.value);
-            bind.add_massage(inpMsg.value);
-            bind.change_json(i);
-            bind.get_json(i);
-            saveKeybinds();
-            // 保存できたことをトースト通知でお知らせ
-            try{ showToast('Saved successfully!'); } catch(e){ /* ignore if showToast not available */ }
-        };
-        tdSave.appendChild(btnSave);
-        tr.appendChild(tdSave);
-
         // 削除ボタン
         const tdDel = document.createElement("td");
         const btnDel = document.createElement("button");
@@ -125,8 +102,26 @@ function renderTable(){
     scrollToBottom();
 }
 
+// (保存ロジックは saveKeybinds(readFromDOM = true) に統合しました)
+
 // localStrageに保存する関数
 function saveKeybinds(){
+    // 現在の入力状態を読み取って keybind を更新
+    for (let i = 0; i < keybind.length; i++){
+        const inpKey = document.getElementById(`key${i}`);
+        const sl = document.getElementById(`event${i}`);
+        const inpTopic = document.getElementById(`topic${i}`);
+        const inpMsg = document.getElementById(`massage${i}`);
+        const kb = keybind[i] || new Keybind();
+
+        if (inpKey) kb.add_key(inpKey.value);
+        if (sl) kb.add_event(sl.value);
+        if (inpTopic) kb.add_topic(inpTopic.value);
+        if (inpMsg) kb.add_massage(inpMsg.value);
+
+        keybind[i] = kb;
+    }
+
     // map: 配列の各要素に関数を適用して、新しいmapを作る
     // keybindのインスタンスをオブジェクトに変換して配列にする
     const arr = keybind.map(k => ({ 
@@ -147,6 +142,11 @@ function saveKeybinds(){
     toRemove.forEach(k => localStorage.removeItem(k));
     // 配列をJSON文字列に変換してlocalStrageに保存
     localStorage.setItem('keybinds', JSON.stringify(arr));
+
+    try{
+        showToast('Saved Successfully!');
+    }catch(e){
+    }
 }
 
 // localStrageから読み込む関数

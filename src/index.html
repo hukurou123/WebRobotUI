@@ -24,6 +24,11 @@
             <input type="text" id="port_name" name="ip_name" size="10" value="8080">
             <input type="button" id="ip_button" value="connect" onclick="ConnectButtonClick()">
             <input type="button" id="disconnect_button" value="disconnect" onclick="disConnectButtonClick()">
+            <div id="file_operation">
+                <button id="conf" onclick=saveKeybinds()>
+                    <img src="./フロッピーディスクアイコン1.png">
+                </button>
+            </div>
         </div>
         <ul class="tab">
             <li><a href="#key">key</a></li>
@@ -40,13 +45,16 @@
                         <th>event</th> 
                         <th>topic</th> 
                         <th>massage</th>
-                        <th id="confbtn"> </th>
+                        <!-- <th id="confbtn"> </th> -->
                         <th id="delbtn"> </th>
                     </tr>
                 </table>
             </div>
             <div id="add_del_button">
                 <button id="add" onclick="add()">+</button>
+                <!-- <button id="conf" onclick="save()">
+                    <img src="./フロッピーディスクアイコン1.png">
+                </button> -->
                 <!-- <button id="del" onclick="del()">−</button> -->
             </div>
         </div>
