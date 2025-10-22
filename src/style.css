@@ -143,6 +143,11 @@ li{
     padding: 10px 10px 0px 10px;
 }
 
+#conf, #export, #import{
+    margin: 0px 5px 0px 5px ;
+}
+
+
 
 /* テーブルのスタイル */
 table, th, td{
@@ -290,8 +295,9 @@ button{
 } */
 
 img{
-    margin-top: 3px;
-    height: 70%;
+    margin-top: 1px;
+    margin-left: -3.5px;
+    height: 90%;
 }
 
 /* ボタンのホバー時，アクティブ時のスタイル */
