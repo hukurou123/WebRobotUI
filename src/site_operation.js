@@ -1,3 +1,10 @@
+/* 
+    site_opeqration.js
+    タブ切り替え処理
+    画面読み込み時の初期処理
+*/
+
+
 // 任意のタブにURLからリンクするための設定
 function GethashID (hashIDName){
     if (hashIDName) {
@@ -41,7 +48,7 @@ window.addEventListener('load', function () {
     add();
 });
 
-//ページを読み込んだ時に行を追加しaaaのタブを有効化
+//ページを読み込んだ時に行を追加しkeyのタブを有効化
 window.onload = function(){
     add();
     document.querySelector('#key').classList.add("is-active");

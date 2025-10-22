@@ -1,6 +1,12 @@
+/*
+    table_operation.js
+    表の行追加、削除、スクロール処理
+*/
+
+
 const tbl = document.getElementById("tbl");
 let count = 0;
-let keybind = [];
+var keybind = [];
 
 // 行を追加する関数
 function add(){
