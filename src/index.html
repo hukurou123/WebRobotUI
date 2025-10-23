@@ -28,12 +28,13 @@
                 <button id="conf" onclick=saveKeybinds()>
                     <img src="./save.png">
                 </button>
-                <button id="export" onclick="exportKeybinds()">
+                <button id="export" onclick="exportJSON()">
                     <img src="./export.png">
                 </button>
-                <button id="import" onclick="importKeybinds()">
+                <button id="import">
                     <img src="./import.png">
                 </button>
+                <input type="file" id="importFile" accept=".json" style="display:none;">
             </div>
         </div>
         <ul class="tab">
@@ -94,6 +95,7 @@
 <script src="./table_operation.js"></script>
 <script src="mqtt.js"></script>
 <script src="./site_operation.js"></script>
+<script src="./file_operation.js"></script>
 
 </body>
 </html>

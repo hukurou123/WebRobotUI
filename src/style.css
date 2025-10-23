@@ -147,6 +147,12 @@ li{
     margin: 0px 5px 0px 5px ;
 }
 
+img{
+    margin-top: 1px;
+    margin-left: -3.5px;
+    height: 90%;
+}
+
 
 
 /* テーブルのスタイル */
@@ -293,12 +299,6 @@ button{
 /* .conf-btn{
     background-color: #afccb8;
 } */
-
-img{
-    margin-top: 1px;
-    margin-left: -3.5px;
-    height: 90%;
-}
 
 /* ボタンのホバー時，アクティブ時のスタイル */
 button:hover{
