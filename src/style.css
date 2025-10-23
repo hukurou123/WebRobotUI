@@ -304,6 +304,15 @@ button:active{
     cursor: pointer;
 }
 
+#swich{
+    width: 90px;
+    position: absolute;
+    top: 10%;
+    left: 3%;
+    transform: translate(50%, -50%);
+    cursor: pointer;
+}
+
 
 
 /* トースト通知用のスタイル */
