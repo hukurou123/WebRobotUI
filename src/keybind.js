@@ -1,3 +1,8 @@
+/*
+    keybind.js
+    キーバインド登録用クラス
+*/
+
 class Keybind {
     key;
     event;

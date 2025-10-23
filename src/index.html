@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>connect</title>
+<title>WebRobotUI</title>
 <link href="style.css" rel="stylesheet">
 <meta-viewport content="width=device-width,initial-scale=1.0,minimum-scale1.0">
 <!--<script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>-->
@@ -104,7 +104,11 @@
     </main>
 </div>
 
+<!-- トースト通知用のコンテナ -->
+<div id="toast-container" aria-live="polite" aria-atomic="true"></div>
+
 <script src="./keybind.js"></script>
+<script src="./table_operation.js"></script>
 <script src="mqtt.js"></script>
 <script src="./site_operation.js"></script>
 <script src="./touchpad.js"></script>
