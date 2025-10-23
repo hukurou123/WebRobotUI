@@ -38,7 +38,7 @@ document.querySelectorAll('.tab a').forEach(function (tab) {
 });
 
 // GamePadの設定画面と操作画面を切り替える関数
-function switchViews(){
+function switchgpViews(){
     const settings = document.getElementById('pad_settings');
     const operate = document.getElementById('pad_operation');
     const btn = document.getElementById('swich');
