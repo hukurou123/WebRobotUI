@@ -1,210 +1,165 @@
-    // const canvas = document.getElementById('canvas');
-    // const context = canvas.getContext('2d');
+// lightweight GamePad helper — robust to unplug/replug
+// - automatically adopts first connected gamepad if target index missing
+// - listens to gamepadconnected/gamepaddisconnected to reset state
+// - provides events: 'pressed', 'released', 'axis_changed'
 
-    // function draw_text_center(text) {
-    //     context.fillStyle = "#fff";
-    //     context.font = '24px Consolas';
-    //     context.textAlign = 'left';
-    //     let text_w = context.measureText(text).width;
-    //     context.fillText(text, canvas.width/2-text_w/2, canvas.height/2);
-    // }
+class GamePad {
+    constructor(no) {
+        this.no = no;
+        this.prev_pressed = [];
+        this.prev_axes = [];
+        this.listener_list = { 'pressed': [], 'released': [], 'axis_changed': [] };
 
-    function updateGamepadStatus() {
+        this.updateGamepadStatus = this.updateGamepadStatus.bind(this);
+
+        // react to connect/disconnect so we can recover when device is unplugged
+        window.addEventListener('gamepadconnected', (e) => {
+            // adopt the device if we don't have an active one
+            if (typeof this.no !== 'number' || !navigator.getGamepads()[this.no]) {
+                this.no = e.gamepad.index;
+            }
+            this.prev_pressed = [];
+            this.prev_axes = [];
+            console.log('gamepad connected index=', e.gamepad.index);
+        });
+
+        window.addEventListener('gamepaddisconnected', (e) => {
+            if (e.gamepad && e.gamepad.index === this.no) {
+                this.no = undefined;
+            }
+            this.prev_pressed = [];
+            this.prev_axes = [];
+            console.log('gamepad disconnected index=', e.gamepad && e.gamepad.index);
+        });
+
+        requestAnimationFrame(this.updateGamepadStatus);
+    }
+
+    addEventListener(type, listener) {
+        if (!this.listener_list[type]) this.listener_list[type] = [];
+        this.listener_list[type].push(listener);
+    }
+
+    notify_event(type, e) {
+        const listeners = this.listener_list[type];
+        if (!listeners || !listeners[Symbol.iterator]) return;
+        for (const func of listeners) {
+            try { func(e); } catch (err) { console.error('listener error', err); }
+        }
+    }
+
+    updateGamepadStatus() {
         const gamepads = navigator.getGamepads();
-        const gamepad = gamepads[0];
-        let text = document.getElementById('gamepad').textContent;
+        let gamepad = (typeof this.no === 'number') ? gamepads[this.no] : null;
+
+        // if target not available, try to find any connected gamepad and adopt it
+        if (!gamepad) {
+            for (let i = 0; i < gamepads.length; i++) {
+                if (gamepads[i]) {
+                    gamepad = gamepads[i];
+                    if (this.no !== i) {
+                        this.no = i;
+                        this.prev_pressed = [];
+                        this.prev_axes = [];
+                        console.log('adopting gamepad index=', i);
+                    }
+                    break;
+                }
+            }
+        }
 
         if (gamepad) {
+            // buttons
             gamepad.buttons.forEach((button, index) => {
-                if (button.pressed) {
-                    // context.clearRect(0,0,canvas.width, canvas.height);
-                    // draw_text_center(`button ${index} pressed`);
-                    document.getElementById('gamepad').textContent = `button ${index} pressed`;
+                const pressed = !!button.pressed;
+                if (pressed) {
+                    if (!this.prev_pressed[index]) {
+                        this.notify_event('pressed', { index });
+                        this.prev_pressed[index] = true;
+                    }
+                } else {
+                    if (this.prev_pressed[index]) {
+                        this.notify_event('released', { index });
+                        this.prev_pressed[index] = false;
+                    }
                 }
             });
-            // 軸表示は個別のコンテナに表示する
-            updateAxesDisplay(gamepad);
+
+            // axes
+            gamepad.axes.forEach((axis, index) => {
+                const prev = (typeof this.prev_axes[index] === 'number') ? this.prev_axes[index] : axis;
+                if (Math.abs(prev - axis) > 0.01) {
+                    this.notify_event('axis_changed', { index, value: axis });
+                }
+                this.prev_axes[index] = axis;
+            });
+
+            // update minimal UI if present
+            const el = document.getElementById('gamepad');
+            if (el) el.textContent = `Gamepad #${this.no}`;
+        } else {
+            // no device: set UI placeholders
+            const el = document.getElementById('gamepad');
+            if (el) el.textContent = 'No gamepad';
+            const s = document.getElementById('stickstatus');
+            if (s) s.textContent = '---';
         }
 
-        requestAnimationFrame(updateGamepadStatus);
-    }
-
-    requestAnimationFrame(updateGamepadStatus);
-
-//     class GamePad {
-//     constructor(no) {
-//         this.no = no;
-//         this.prev_pressed = [];
-//         this.listener_list = { 'pressed': [], 'released': [] }
-
-//         this.updateGamepadStatus = this.updateGamepadStatus.bind(this);
-//         requestAnimationFrame(this.updateGamepadStatus);
-//     }
-
-//     addEventListener(type, listener) {
-//         this.listener_list[type].push(listener);
-//     }
-
-//     notify_event(type, e) {
-//         let listeners = this.listener_list[type];
-//         for (let func of listeners) {
-//             func(e);
-//         }
-//     }
-
-//     updateGamepadStatus() {
-//         const gamepads = navigator.getGamepads();
-//         const gamepad = gamepads[this.no];
-
-//         if (gamepad) {
-//             // ボタンの状態をチェック
-//             gamepad.buttons.forEach((button, index) => {
-//                 if (button.pressed) {
-//                     if(!this.prev_pressed[index]) {
-//                     // 押されていない状態から押された状態になった場合にpressedイベントを発信する 
-//                         this.notify_event("pressed", { index: index });
-//                         this.prev_pressed[index] = true;
-//                     }
-//                 } else {
-//                     if(this.prev_pressed[index]) {
-//                         // 押されていた状態から押されていない状態になった場合にreleasedイベントを発信する 
-//                         this.notify_event("released", { index: index });
-//                         this.prev_pressed[index] = false;
-//                     }
-//                 }
-//             });
-//             gamepad.axes.forEach((axis, index) => {
-//                 // 軸の状態をここで処理することも可能
-//             });
-//         }
-
-//         // 次のフレームでまたポーリングを実行
-//         requestAnimationFrame(this.updateGamepadStatus);
-//     }
-// }
-
-// --- axes 表示用ユーティリティ ------------------------------------------------
-function applyDeadzone(v, deadzone = 0.12){
-    if (Math.abs(v) < deadzone) return 0;
-    const sign = Math.sign(v);
-    return ((Math.abs(v) - deadzone) / (1 - deadzone)) * sign;
-}
-
-function ensureAxesContainer(){
-    let c = document.getElementById('axes-container');
-    if (!c) {
-        c = document.createElement('div');
-        c.id = 'axes-container';
-        c.style.position = 'fixed';
-        c.style.right = '12px';
-        c.style.top = '80px';
-        c.style.background = 'rgba(0,0,0,0.6)';
-        c.style.color = '#fff';
-        c.style.padding = '8px';
-        c.style.borderRadius = '6px';
-        c.style.fontFamily = 'monospace';
-        c.style.zIndex = '9999';
-        document.body.appendChild(c);
-    }
-    return c;
-}
-
-// 各フレームで axes の表示を更新する関数
-function updateAxesDisplay(gamepad){
-    if (!gamepad || !gamepad.axes) return;
-    const axes = gamepad.axes;
-    const container = ensureAxesContainer();
-    const labels = ['LX','LY','RX','RY'];
-
-    for (let i = 0; i < axes.length; i++){
-        const raw = axes[i];
-        const v = applyDeadzone(raw, 0.12);
-        const disp = v.toFixed(2);
-        const id = `axis-${i}`;
-        let el = document.getElementById(id);
-        if (!el){
-            el = document.createElement('div');
-            el.id = id;
-            el.style.marginBottom = '4px';
-            el._prev = NaN;
-            container.appendChild(el);
-        }
-        const prev = el._prev;
-        if (Number.isNaN(prev) || Math.abs(prev - v) > 0.01){
-            const label = labels[i] || `A${i}`;
-            el.textContent = `${label}: ${disp}`;
-            el._prev = v;
-        }
+        requestAnimationFrame(this.updateGamepadStatus);
     }
 }
 
 
-// let gamepad = new GamePad(0) // 0番目のゲームパッドを対象とするオブジェクトを生成する
-// let text = document.getElementById('gamepad').textContent;
 
-// // ボタンが押された時のイベントハンドラーを登録する
-// gamepad.addEventListener("pressed", btnDownHandler);
+// --------- instance + handlers ------------------------------------------------
+const gamepad = new GamePad(0);
 
-// // ボタンが離された時のイベントハンドラーを登録する
-// gamepad.addEventListener("released", btnUpHandler);
+// safe DOM helper
+function safeSetText(id, text) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = text;
+}
 
-// function btnDownHandler(event) {
-//     switch(event.index) {
-//         case 0:
-//             document.getElementById('gamepad').textContent = `A pressed`;
-//             break;
-//         case 1:
-//             document.getElementById('gamepad').textContent = `B pressed`;
-//             break;
-//         case 2:
-//             document.getElementById('gamepad').textContent = `Y pressed`;
-//             break;
-//         case 3:
-//             document.getElementById('gamepad').textContent = `X pressed`;
-//             break;
-//         case 4:
-//             document.getElementById('gamepad').textContent = `LB pressed`;
-//             break;
-//         case 5:
-//             document.getElementById('gamepad').textContent = `RB pressed`;
-//             break;
-//         case 6:
-//             document.getElementById('gamepad').textContent = `LT pressed`;
-//             break;
-//         case 7:
-//             document.getElementById('gamepad').textContent = `RT pressed`;
-//             break;
-//         case 8:
-//             document.getElementById('gamepad').textContent = `Back pressed`;
-//             break;
-//         case 9:
-//             document.getElementById('gamepad').textContent = `Start pressed`;
-//             break;
-//         case 10:
-//             document.getElementById('gamepad').textContent = `L3 pressed`;
-//             break;
-//         case 11:
-//             document.getElementById('gamepad').textContent = `R3 pressed`;
-//             break;
-//         case 12:
-//             document.getElementById('gamepad').textContent = `Up pressed`;
-//             break;
-//         case 13:
-//             document.getElementById('gamepad').textContent = `Down pressed`;
-//             break;
-//         case 14:
-//             document.getElementById('gamepad').textContent = `Left pressed`;
-//             break;
-//         case 15:
-//             document.getElementById('gamepad').textContent = `Right pressed`;
-//             break;
-//         default:
-//             // その他のボタンは無視
-//             break;
-//     }
-// }
+// register handlers
+gamepad.addEventListener('pressed', btnDownHandler);
+gamepad.addEventListener('released', btnUpHandler);
+gamepad.addEventListener('axis_changed', stickHandler);
 
-// function btnUpHandler(event) {
-//     document.getElementById('gamepad').textContent = `released`;
-// }
+function stickHandler(event) {
+    const v = (typeof event.value === 'number') ? event.value.toFixed(2) : '0.00';
+    switch (event.index) {
+        case 0: safeSetText('stickstatus', `Left Stick X: ${v}`); break;
+        case 1: safeSetText('stickstatus', `Left Stick Y: ${v}`); break;
+        case 2: safeSetText('stickstatus', `Right Stick X: ${v}`); break;
+        case 3: safeSetText('stickstatus', `Right Stick Y: ${v}`); break;
+        default: safeSetText('stickstatus', `A${event.index}: ${v}`); break;
+    }
+}
+
+function btnDownHandler(event) {
+    console.log('Button pressed', event.index);
+    switch (event.index) {
+        case 0: safeSetText('gamepad', 'A pressed'); break;
+        case 1: safeSetText('gamepad', 'B pressed'); break;
+        case 2: safeSetText('gamepad', 'Y pressed'); break;
+        case 3: safeSetText('gamepad', 'X pressed'); break;
+        case 4: safeSetText('gamepad', 'LB pressed'); break;
+        case 5: safeSetText('gamepad', 'RB pressed'); break;
+        case 6: safeSetText('gamepad', 'LT pressed'); break;
+        case 7: safeSetText('gamepad', 'RT pressed'); break;
+        case 8: safeSetText('gamepad', 'Back pressed'); break;
+        case 9: safeSetText('gamepad', 'Start pressed'); break;
+        case 10: safeSetText('gamepad', 'L3 pressed'); break;
+        case 11: safeSetText('gamepad', 'R3 pressed'); break;
+        case 12: safeSetText('gamepad', 'Up pressed'); break;
+        case 13: safeSetText('gamepad', 'Down pressed'); break;
+        case 14: safeSetText('gamepad', 'Left pressed'); break;
+        case 15: safeSetText('gamepad', 'Right pressed'); break;
+        default: safeSetText('gamepad', `Btn ${event.index} pressed`); break;
+    }
+}
+
+function btnUpHandler(/* event */) {
+    safeSetText('gamepad', 'released');
+}
 
