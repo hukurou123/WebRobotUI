@@ -5,6 +5,7 @@
 
 
 let tbl = document.getElementById("tbl");
+let pad_tbl = document.getElementById("pad_tbl");
 var keybind = [];
 var padKeybind = [];
 const PAD_BUTTONS = ['A','B','X','Y','LB','RB','LT','RT','Back','Start','L3','R3','Up','Down','Left','Right'];
@@ -15,7 +16,7 @@ function add(){
     renderTable();
 }
 
-// 行を削除する関数
+// 行を削除する関数 (キー用)
 function remove(index){
     // リストの範囲外だったら何もしない
     if (index < 0 || index >= keybind.length) return;
@@ -24,97 +25,111 @@ function remove(index){
     // リストが空になったら空行を追加
     if (keybind.length === 0) keybind.push(new Keybind());
 
-    // saveKeybinds();
     renderTable();
 }
 
-// 表を描画する関数
+// 表を描画する関数 (キー用)
 function renderTable(){
-    // 表の初期化 — ヘッダを確実に揃えるため、ヘッダ行を再構築する
-    ensureKeyTableHeader();
+    // 抽象化された共通レンダラを利用して描画
+    renderGenericTable({
+        tableId: 'tbl',
+        data: keybind,
+        options: {
+            includeIndex: true,
+            includeDelete: true,
+            keyEditable: true,
+            idPrefix: ''
+        }
+    });
+}
 
-    // キーバインドのリストの長さ回繰り返す bindはKeybindのインスタンス iはインデックス
-    keybind.forEach((bind, i) => {
-        const tr = document.createElement("tr");
+// 表を描画する関数 (ゲームパッド用)
+function renderPadTable(){
+    renderGenericTable({
+        tableId: 'pad_tbl',
+        data: padKeybind,
+        options: {
+            includeIndex: false,
+            includeDelete: false,
+            keyEditable: false,
+            idPrefix: 'pad_'
+        },
+    });
+}
 
-        // 行番号
-        const tdIndex = document.createElement("td");
-        tdIndex.textContent = i + 1;
-        tdIndex.classList.add('count');
-        tr.appendChild(tdIndex);
 
-        // キー
-        const tdKey = document.createElement("td");
-        const inpKey = document.createElement("input");
-        inpKey.id = `key${i}`;
-        inpKey.classList.add("cell");
-        // もしbind.get_key()が存在したらそれをvalueに設定、なければ空文字を設定
-        inpKey.value = bind.get_key() || "";
-        tdKey.appendChild(inpKey);
+// 汎用的テーブルレンダラ
+function renderGenericTable({tableId, data, options = {}, onSaveRow}){
+    const { includeIndex = false, includeDelete = false, keyEditable = true, idPrefix = '' } = options;
+    const tblEl = document.getElementById(tableId);
+    if (!tblEl) return;
+
+    // ヘッダは既存のものを利用する前提。行をすべて削除してから再描画
+    while (tblEl.rows.length > 1) tblEl.deleteRow(1);
+
+    data.forEach((bind, i) => {
+        const tr = document.createElement('tr');
+
+        if (includeIndex){
+            const tdIndex = document.createElement('td');
+            tdIndex.textContent = i + 1;
+            tdIndex.classList.add('count');
+            tr.appendChild(tdIndex);
+        }
+
+        // key cell
+        const tdKey = document.createElement('td');
+        if (keyEditable){
+            const inpKey = document.createElement('input');
+            inpKey.id = `${idPrefix}key${i}`;
+            inpKey.classList.add('cell');
+            inpKey.value = (typeof bind.get_key === 'function') ? bind.get_key() || '' : (bind.key || '');
+            tdKey.appendChild(inpKey);
+        } else {
+            tdKey.textContent = bind.key || '';
+            tdKey.id = `${idPrefix}key${i}`;
+            tdKey.classList.add('no-edit-cell');
+            // tdKey.classList.add('count');
+        }
         tr.appendChild(tdKey);
 
-        // イベント
-        const tdEvent = document.createElement("td");
+        // event select
+        const tdEvent = document.createElement('td');
         const sl = document.createElement('select');
-        // 選択肢の作成
-        ["down" , "up"].forEach(opt => {
-            const option = document.createElement('option');
-            option.text = opt;
-            if (bind.get_event() === opt) option.selected = true;
-            sl.appendChild(option);
+        ['down','up'].forEach(opt => {
+            const option = document.createElement('option'); option.text = opt; if ((bind.event || '') === opt) option.selected = true; sl.appendChild(option);
         });
-        sl.id = `event${i}`;
-        sl.classList.add("cell");
+        sl.id = `${idPrefix}event${i}`;
+        sl.classList.add('cell');
         tdEvent.appendChild(sl);
         tr.appendChild(tdEvent);
 
-        // トピック
-        const tdTopic = document.createElement("td");
-        const inpTopic = document.createElement("input");
-        inpTopic.id = `topic${i}`;
-        inpTopic.classList.add("cell");
-        inpTopic.value = bind.get_topic() || "";
-        tdTopic.appendChild(inpTopic);
-        tr.appendChild(tdTopic);
+        // topic
+        const tdTopic = document.createElement('td');
+        const inpTopic = document.createElement('input'); inpTopic.id = `${idPrefix}topic${i}`; inpTopic.classList.add('cell'); inpTopic.value = bind.topic || '';
+        tdTopic.appendChild(inpTopic); tr.appendChild(tdTopic);
 
-        // メッセージ
-        const tdMsg = document.createElement("td");
-        const inpMsg = document.createElement("input");
-        inpMsg.id = `massage${i}`;
-        inpMsg.classList.add("cell");
-        inpMsg.value = bind.get_massage() || "";
-        tdMsg.appendChild(inpMsg);
-        tr.appendChild(tdMsg);
+        // message
+        const tdMsg = document.createElement('td');
+        const inpMsg = document.createElement('input'); inpMsg.id = `${idPrefix}massage${i}`; inpMsg.classList.add('cell'); inpMsg.value = bind.massage || '';
+        tdMsg.appendChild(inpMsg); tr.appendChild(tdMsg);
 
-        // 削除ボタン
-        const tdDel = document.createElement("td");
-        const btnDel = document.createElement("button");
-        btnDel.textContent = "−";
-        // 削除ボタンの角を丸くしたいから,tdを背景色にするためのクラスづけ
-        tdDel.classList.add('delete-btn');
-        btnDel.onclick = () => remove(i);
-        tdDel.appendChild(btnDel);
-        tr.appendChild(tdDel);
+        // delete (optional)
+        if (includeDelete){
+            const tdDel = document.createElement('td');
+            tdDel.classList.add('delete-btn');
+            const btnDel = document.createElement('button'); btnDel.textContent = '−'; btnDel.onclick = () => { if (typeof data.splice === 'function') { data.splice(i,1); /* re-render */ renderGenericTable({tableId, data, options, onSaveRow}); } };
+            tdDel.appendChild(btnDel);
+            tr.appendChild(tdDel);
+        }
 
-        tbl.appendChild(tr);
+        tblEl.appendChild(tr);
     });
 
-    scrollToBottom();
+    // scroll (if this table is the main one, keep legacy behavior)
+    if (tableId === 'tbl') scrollToBottom();
 }
 
-// 明示的に key タブのヘッダ行を作り直す（列ずれ防止）
-function ensureKeyTableHeader(){
-    // 再作成: 先頭のヘッダ行だけを残す（DOM を直接置き換える）
-    const parent = tbl.parentElement;
-    // build header HTML
-    const header = document.createElement('table');
-    header.id = 'tbl';
-    header.innerHTML = `\n        <tr>\n            <th> </th>\n            <th>key</th>\n            <th>event</th>\n            <th>topic</th>\n            <th>massage</th>\n            <th id="confbtn"> </th>\n            <th id="delbtn"> </th>\n        </tr>`;
-    // replace the existing table with a fresh one
-    parent.replaceChild(header, tbl);
-    // update global reference
-    tbl = document.getElementById('tbl');
-}
 
 // localStrageに保存する関数
 function saveKeybinds(){
@@ -234,88 +249,46 @@ function scrollToBottom(){
 
 
 // --- pad table handling (fixed rows, no add/remove) -------------------------
-// function loadPadKeybinds(){
-//     const data = localStorage.getItem('pad_keybinds');
-//     padKeybind = [];
-//     if (data) {
-//         try {
-//             const parsed = JSON.parse(data);
-//             if (Array.isArray(parsed)) {
-//                 padKeybind = parsed.map(obj => ({ key: obj.key, event: obj.event, topic: obj.topic, massage: obj.massage }));
-//             }
-//         } catch(e){ console.error('failed to parse pad_keybinds', e); }
-//     }
-//     // ensure we have entries for all PAD_BUTTONS
-//     for (let i = 0; i < PAD_BUTTONS.length; i++){
-//         if (!padKeybind[i]) padKeybind[i] = { key: PAD_BUTTONS[i], event: 'down', topic: '', massage: '' };
-//         else padKeybind[i].key = PAD_BUTTONS[i];
-//     }
-// }
+function loadPadKeybinds(){
+    const data = localStorage.getItem('pad_keybinds');
+    padKeybind = [];
+    if (data) {
+        try {
+            const parsed = JSON.parse(data);
+            if (Array.isArray(parsed)) {
+                padKeybind = parsed.map(obj => ({ key: obj.key, event: obj.event, topic: obj.topic, massage: obj.massage }));
+            }
+        } catch(e){ console.error('failed to parse pad_keybinds', e); }
+    }
+    // ensure we have entries for all PAD_BUTTONS
+    for (let i = 0; i < PAD_BUTTONS.length; i++){
+        if (!padKeybind[i]) padKeybind[i] = { key: PAD_BUTTONS[i], event: 'down', topic: '', massage: '' };
+        else padKeybind[i].key = PAD_BUTTONS[i];
+    }
+}
 
-// function savePadKeybinds(){
-//     localStorage.setItem('pad_keybinds', JSON.stringify(padKeybind));
-// }
+// ページ初期化時に padKeybind を PAD_BUTTONS の数だけ用意する（未保存ならデフォルト）
+function initializePadKeybinds(){
+    // 既に loadPadKeybinds() を使っている場合はそれを呼ぶ
+    loadPadKeybinds();
+    // 追加の安全措置: もし localStorage に何もなくても PAD_BUTTONS に合わせる
+    for (let i = 0; i < PAD_BUTTONS.length; i++){
+        if (!padKeybind[i]) padKeybind[i] = { key: PAD_BUTTONS[i], event: 'down', topic: '', massage: '' };
+        else padKeybind[i].key = PAD_BUTTONS[i];
+    }
+}
 
-// function renderPadTable(){
-//     // ensure header exists and is correct
-//     const parent = document.getElementById('pad_tbl') ? document.getElementById('pad_tbl').parentElement : null;
-//     if (!parent) return;
-//     // rebuild pad table header in case of previous DOM changes
-//     const newPadTable = document.createElement('table');
-//     newPadTable.id = 'pad_tbl';
-//     newPadTable.innerHTML = `\n        <tr>\n            <th>key</th>\n            <th>event</th>\n            <th>topic</th>\n            <th>massage</th>\n            <th id="confbtn"> </th>\n            <th id="delbtn"> </th>\n        </tr>`;
-//     parent.replaceChild(newPadTable, document.getElementById('pad_tbl'));
-//     const padTbl = document.getElementById('pad_tbl');
-
-//     padKeybind.forEach((bind, i) => {
-//         const tr = document.createElement('tr');
-
-//         // key name (fixed)
-//         const tdKey = document.createElement('td');
-//         tdKey.textContent = bind.key;
-//         tdKey.classList.add('count');
-//         tr.appendChild(tdKey);
-
-//         // event select
-//         const tdEvent = document.createElement('td');
-//         const sl = document.createElement('select');
-//         ['down','up'].forEach(opt => {
-//             const option = document.createElement('option'); option.text = opt; if (bind.event === opt) option.selected = true; sl.appendChild(option);
-//         });
-//         sl.classList.add('cell');
-//         tdEvent.appendChild(sl);
-//         tr.appendChild(tdEvent);
-
-//         // topic
-//         const tdTopic = document.createElement('td');
-//         const inpTopic = document.createElement('input'); inpTopic.classList.add('cell'); inpTopic.value = bind.topic || '';
-//         tdTopic.appendChild(inpTopic); tr.appendChild(tdTopic);
-
-//         // message
-//         const tdMsg = document.createElement('td');
-//         const inpMsg = document.createElement('input'); inpMsg.classList.add('cell'); inpMsg.value = bind.massage || '';
-//         tdMsg.appendChild(inpMsg); tr.appendChild(tdMsg);
-
-//         // save
-//         const tdSave = document.createElement('td'); tdSave.classList.add('conf-btn');
-//         const btn = document.createElement('button'); btn.textContent = 'save';
-//         btn.onclick = () => {
-//             bind.event = sl.value; bind.topic = inpTopic.value; bind.massage = inpMsg.value; savePadKeybinds(); try{ showToast('Pad saved'); }catch(e){}
-//         };
-//         tdSave.appendChild(btn); tr.appendChild(tdSave);
-
-//         // no delete column for pad table — add empty cell to keep alignment
-//         const tdEmpty = document.createElement('td'); tdEmpty.classList.add('delete-btn'); tr.appendChild(tdEmpty);
-
-//         padTbl.appendChild(tr);
-//     });
-// }
-
+function savePadKeybinds(){
+    localStorage.setItem('pad_keybinds', JSON.stringify(padKeybind));
+}
 
 // 読み込み時に表を初期化
 window.onload = () => {
     loadKeybinds();
     renderTable();
+    // initialize padKeybinds to the controller buttons and render
+    initializePadKeybinds();
+    renderPadTable();
     // loadPadKeybinds();
     // renderPadTable();
 };

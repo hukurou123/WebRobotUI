@@ -212,6 +212,13 @@ td{
     text-align: center;
 }
 
+.no-edit-cell{
+    background: #FEF9F2;
+    text-align: center;
+    width: 150px;
+    height: 30px;
+}
+
 /* カウント表示のスタイル */
 #count{
     text-align: center;
@@ -321,8 +328,8 @@ button:active{
 #swich{
     width: 90px;
     position: absolute;
-    top: 10%;
-    left: 3%;
+    top: 7%;
+    left: 3.5%;
     transform: translate(50%, -50%);
     cursor: pointer;
 }
