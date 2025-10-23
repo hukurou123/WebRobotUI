@@ -63,20 +63,28 @@
         </div>
         <div id="GamePad" class="area">
             <div id="swich_button">
-                <button id="swich" onclick="switchArea()">operate</button>
+                <button id="swich" onclick="switchViews()">operate</button>
             </div>
-            <div class="table">
-                <table id="pad_tbl">
-                    <tr>
-                        <th>key</th>
-                        <th>event</th> 
-                        <th>topic</th> 
-                        <th>massage</th>
-                    </tr>
-                </table>
+
+            <!-- Setting View -->
+            <div id="pad_settings" class="tp-view is-active">
+                <div class="table">
+                    <table id="pad_tbl">
+                        <tr>
+                            <th>key</th>
+                            <th>event</th> 
+                            <th>topic</th> 
+                            <th>massage</th>
+                        </tr>
+                    </table>
+                </div>
             </div>
-            <h3 id="gamepad">no connect</h3>
-            <h3 id="stickstatus">stick status</h3>
+
+            <!-- Operation View -->
+            <div id="pad_operation" class="tp-view">
+                <h3 id="gamepad">no connect</h3>
+                <h3 id="stickstatus">stick status</h3>
+            </div>
         </div>
         <div id="Touch" class="area">
             <div class="touchpad-header">

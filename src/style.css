@@ -328,8 +328,8 @@ button:active{
 #swich{
     width: 90px;
     position: absolute;
-    top: 7%;
-    left: 3.5%;
+    bottom: 2%;
+    left: 3.4%;
     transform: translate(50%, -50%);
     cursor: pointer;
 }
@@ -338,6 +338,8 @@ button:active{
     margin-top: 14px;
     margin-right: 10px;
 }
+
+
 
 /* TouchPad */
 .touchpad-header{
@@ -351,6 +353,10 @@ button:active{
 }
 .tp-view{ display: none; opacity: 0; }
 .tp-view.is-active{ display: block; opacity: 1; }
+
+#pad_operation{
+    padding: 3.3%;
+}
 
 .dpad{
     display: flex;

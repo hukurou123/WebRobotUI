@@ -37,6 +37,23 @@ document.querySelectorAll('.tab a').forEach(function (tab) {
     });
 });
 
+// GamePadの設定画面と操作画面を切り替える関数
+function switchViews(){
+    const settings = document.getElementById('pad_settings');
+    const operate = document.getElementById('pad_operation');
+    const btn = document.getElementById('swich');
+    const settingsActive = settings.classList.contains('is-active');
+    if (settingsActive){
+        settings.classList.remove('is-active');
+        operate.classList.add('is-active');
+        btn.textContent = 'settings';
+    } else {
+        operate.classList.remove('is-active');
+        settings.classList.add('is-active');
+        btn.textContent = 'operate';
+    }
+}
+
 // 上記の動きをページが読み込まれたらすぐに動かす
 window.addEventListener('load', function () {
     const firstTabLi = document.querySelector('.tab li:first-of-type');
