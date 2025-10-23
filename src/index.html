@@ -24,11 +24,23 @@
             <input type="text" id="port_name" name="ip_name" size="10" value="8080">
             <input type="button" id="ip_button" value="connect" onclick="ConnectButtonClick()">
             <input type="button" id="disconnect_button" value="disconnect" onclick="disConnectButtonClick()">
+            <div id="file_operation">
+                <button id="conf" onclick=saveKeybinds()>
+                    <img src="./save.png">
+                </button>
+                <button id="export" onclick="exportJSON()">
+                    <img src="./export.png">
+                </button>
+                <button id="import">
+                    <img src="./import.png">
+                </button>
+                <input type="file" id="importFile" accept=".json" style="display:none;">
+            </div>
         </div>
         <ul class="tab">
             <li><a href="#key">key</a></li>
-            <li><a href="#pad">pad</a></li>
-            <li><a href="#uuu">uuu</a></li>
+            <li><a href="#GamePad">Pad</a></li>
+            <li><a href="#Touch">Touch</a></li>
         </ul>
             
         <div id="key" class="area">
@@ -40,17 +52,16 @@
                         <th>event</th> 
                         <th>topic</th> 
                         <th>massage</th>
-                        <th id="confbtn"> </th>
+                        <!-- <th id="confbtn"> </th> -->
                         <th id="delbtn"> </th>
                     </tr>
                 </table>
             </div>
             <div id="add_del_button">
                 <button id="add" onclick="add()">+</button>
-                <!-- <button id="del" onclick="del()">−</button> -->
             </div>
         </div>
-        <div id="pad" class="area">
+        <div id="GamePad" class="area">
             <div id="swich_button">
                 <button id="swich" onclick="switchArea()">operate</button>
             </div>
@@ -69,19 +80,50 @@
             <h3 id="gamepad">no connect</h3>
             <h3 id="stickstatus">stick status</h3>
         </div>
-        <div id="uuu" class="area">
-            <h2>だいなそー</h2>
-            <ul>
-                <li>てぃらの</li>
-                <li>すぴの</li>
-                <li>とりけら</li>
-            </ul>
-        </div>
-    </main>
+        <div id="Touch" class="area">
+            <div class="touchpad-header">
+                <button id="tp_toggle" class="tp-toggle" title="切り替え">操作</button>
+                <h2>TouchPad</h2>
+            </div>
 
-    <footer>
-        <p>WebRobotUI</p>   
-    </footer>
+            <!-- Settings View -->
+            <div id="tp_settings" class="tp-view is-active">
+                <div class="table">
+                    <table id="tp_tbl">
+                        <tr>
+                            <th> </th>
+                            <th>button</th>
+                            <th>event</th> 
+                            <th>topic</th> 
+                            <th>massage</th>
+                            <th id="tp_confbtn"> </th>
+                            <th id="tp_delbtn"> </th>
+                        </tr>
+                    </table>
+                </div>
+                <div id="tp_add_del_button">
+                    <button id="tp_add" onclick="tpAdd()">+</button>
+                </div>
+            </div>
+
+            <!-- Operation View -->
+            <div id="tp_operate" class="tp-view">
+                <div class="dpad">
+                    <button class="dpad-btn up" id="tp_up" data-button="Up">▲</button>
+                    <div class="middle-row">
+                        <button class="dpad-btn left" id="tp_left" data-button="Left">◀</button>
+                        <div class="center-spacer"></div>
+                        <button class="dpad-btn right" id="tp_right" data-button="Right">▶</button>
+                    </div>
+                    <button class="dpad-btn down" id="tp_down" data-button="Down">▼</button>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>WebRobotUI</p>   
+        </footer>
+    </main>
 </div>
 
 <!-- トースト通知用のコンテナ -->
@@ -92,6 +134,8 @@
 <script src="./table_operation.js"></script>
 <script src="mqtt.js"></script>
 <script src="./site_operation.js"></script>
+<script src="./file_operation.js"></script>
+<script src="./touchpad.js"></script>
 
 </body>
 </html>
