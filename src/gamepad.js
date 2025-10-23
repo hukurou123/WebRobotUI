@@ -95,12 +95,14 @@ class GamePad {
             });
 
             // update minimal UI if present
-            const el = document.getElementById('gamepad');
+            const el = document.getElementById('connection-gamepad');
             if (el) el.textContent = `Gamepad #${this.no}`;
         } else {
             // no device: set UI placeholders
-            const el = document.getElementById('gamepad');
+            const el = document.getElementById('connection-gamepad');
             if (el) el.textContent = 'No gamepad';
+            const b = document.getElementById('buttonstatus');
+            if (b) b.textContent = '---';
             const s = document.getElementById('stickstatus');
             if (s) s.textContent = '---';
         }
@@ -137,29 +139,29 @@ function stickHandler(event) {
 }
 
 function btnDownHandler(event) {
-    console.log('Button pressed', event.index);
+    // console.log('Button pressed', event.index);
     switch (event.index) {
-        case 0: safeSetText('gamepad', 'A pressed'); break;
-        case 1: safeSetText('gamepad', 'B pressed'); break;
-        case 2: safeSetText('gamepad', 'Y pressed'); break;
-        case 3: safeSetText('gamepad', 'X pressed'); break;
-        case 4: safeSetText('gamepad', 'LB pressed'); break;
-        case 5: safeSetText('gamepad', 'RB pressed'); break;
-        case 6: safeSetText('gamepad', 'LT pressed'); break;
-        case 7: safeSetText('gamepad', 'RT pressed'); break;
-        case 8: safeSetText('gamepad', 'Back pressed'); break;
-        case 9: safeSetText('gamepad', 'Start pressed'); break;
-        case 10: safeSetText('gamepad', 'L3 pressed'); break;
-        case 11: safeSetText('gamepad', 'R3 pressed'); break;
-        case 12: safeSetText('gamepad', 'Up pressed'); break;
-        case 13: safeSetText('gamepad', 'Down pressed'); break;
-        case 14: safeSetText('gamepad', 'Left pressed'); break;
-        case 15: safeSetText('gamepad', 'Right pressed'); break;
-        default: safeSetText('gamepad', `Btn ${event.index} pressed`); break;
+        case 0: safeSetText('buttonstatus', 'A pressed'); break;
+        case 1: safeSetText('buttonstatus', 'B pressed'); break;
+        case 2: safeSetText('buttonstatus', 'Y pressed'); break;
+        case 3: safeSetText('buttonstatus', 'X pressed'); break;
+        case 4: safeSetText('buttonstatus', 'LB pressed'); break;
+        case 5: safeSetText('buttonstatus', 'RB pressed'); break;
+        case 6: safeSetText('buttonstatus', 'LT pressed'); break;
+        case 7: safeSetText('buttonstatus', 'RT pressed'); break;
+        case 8: safeSetText('buttonstatus', 'Back pressed'); break;
+        case 9: safeSetText('buttonstatus', 'Start pressed'); break;
+        case 10: safeSetText('buttonstatus', 'L3 pressed'); break;
+        case 11: safeSetText('buttonstatus', 'R3 pressed'); break;
+        case 12: safeSetText('buttonstatus', 'Up pressed'); break;
+        case 13: safeSetText('buttonstatus', 'Down pressed'); break;
+        case 14: safeSetText('buttonstatus', 'Left pressed'); break;
+        case 15: safeSetText('buttonstatus', 'Right pressed'); break;
+        default: safeSetText('buttonstatus', `Btn ${event.index} pressed`); break;
     }
 }
 
 function btnUpHandler(/* event */) {
-    safeSetText('gamepad', 'released');
+    safeSetText('buttonstatus', 'released');
 }
 
