@@ -8,7 +8,7 @@ let tbl = document.getElementById("tbl");
 let pad_tbl = document.getElementById("pad_tbl");
 var keybind = [];
 var padKeybind = [];
-const PAD_BUTTONS = ['A','B','X','Y','LB','RB','LT','RT','Back','Start','L3','R3','Up','Down','Left','Right'];
+const PAD_BUTTONS = ['A','B','X','Y','LB','RB','LT','RT','Back','Start','L3','R3','Up','Down','Left','Right', 'Left X', 'Left Y', 'Right X', 'Right Y'];
 
 // 行を追加する関数
 function add(){
@@ -89,7 +89,6 @@ function renderGenericTable({tableId, data, options = {}, onSaveRow}){
             tdKey.textContent = bind.key || '';
             tdKey.id = `${idPrefix}key${i}`;
             tdKey.classList.add('no-edit-cell');
-            // tdKey.classList.add('count');
         }
         tr.appendChild(tdKey);
 
