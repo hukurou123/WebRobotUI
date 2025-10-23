@@ -19,6 +19,7 @@ function exportJSON(filename){
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
+    // ファイル名を指定しない場合は日付を使う
     const currentDate = new Date();
     const year = currentDate.getFullYear();
     const month = String(currentDate.getMonth() + 1).padStart(2, '0');
@@ -63,16 +64,25 @@ function importJSON(inputEl){
     if (!file) return;
     importLocalStorageFile(file, { merge: true })
         .then(() => {
-            showToast && showToast('import successfully!');
-            // 読み込んだらテーブルなどを再描画したい場合は任意で呼ぶ
-            if (typeof loadKeybinds === 'function'){
-                try{ loadKeybinds(); renderTable(); } catch(e){}
-            }
+                showToast && showToast('import successfully!');
+                // 読み込んだらテーブルなどを再描画
+                if (typeof loadKeybinds === 'function'){
+                    try{ loadKeybinds(); renderTable(); } catch(e){}
+                }
+                // BrokerIP / BrokerPORT があればフォームに反映
+                try{
+                    const ip = localStorage.getItem('BrokerIP');
+                    const port = localStorage.getItem('BrokerPORT');
+                    const ipEl = document.getElementById('ip_name');
+                    const portEl = document.getElementById('port_name');
+                    if (ip && ipEl) ipEl.value = ip;
+                    if (port && portEl) portEl.value = port;
+                } catch(e){}
         })
-        .catch(err => {
-            console.error(err);
-            showToast && showToast('import failed', e);
-        })
+            .catch(err => {
+                console.error(err);
+                showToast && showToast('import failed: ' + (err && err.message ? err.message : '')); 
+            })
         .finally(()=>{ inputEl.value = ''; });
 }
 
