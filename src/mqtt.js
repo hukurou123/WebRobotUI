@@ -72,7 +72,7 @@ document.addEventListener('keydown', event => {
         if (event.key == keybind[i].get_key() && keybind[i].get_event()=="down"){
             console.log(event.key+"です");
             if (client && typeof client.publish === 'function'){
-                client.publish(keybind[i].get_topic(), keybind[i].get_massage());
+                client.publish(keybind[i].get_topic(), keybind[i].get_message());
             } else {
                 console.warn('publish skipped: client not ready');
             }
@@ -96,7 +96,7 @@ document.addEventListener('keyup', event => {
         if (event.key == keybind[i].get_key() && keybind[i].get_event()=="up"){
             // console.log(event.key+"です");
             if (client && typeof client.publish === 'function'){
-                client.publish(keybind[i].get_topic(), keybind[i].get_massage());
+                client.publish(keybind[i].get_topic(), keybind[i].get_message());
             } else {
                 console.warn('publish skipped: client not ready');
             }

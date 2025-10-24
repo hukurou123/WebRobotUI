@@ -116,7 +116,7 @@ function renderGenericTable({tableId, data, options = {}, onSaveRow}){
 
         // message
         const tdMsg = document.createElement('td');
-        const inpMsg = document.createElement('input'); inpMsg.id = `${idPrefix}massage${i}`; inpMsg.classList.add('cell'); inpMsg.value = bind.massage || '';
+        const inpMsg = document.createElement('input'); inpMsg.id = `${idPrefix}message${i}`; inpMsg.classList.add('cell'); inpMsg.value = bind.message || '';
         tdMsg.appendChild(inpMsg); tr.appendChild(tdMsg);
 
         // delete (optional)
@@ -145,7 +145,7 @@ function saveKeybinds(){
         const inpKey = document.getElementById(`key${i}`);
         const sl = document.getElementById(`event${i}`);
         const inpTopic = document.getElementById(`topic${i}`);
-        const inpMsg = document.getElementById(`massage${i}`);
+        const inpMsg = document.getElementById(`message${i}`);
         const kb = keybind[i] || new Keybind();
         if (inpKey && typeof kb.add_key === 'function') kb.add_key(inpKey.value);
         else if (inpKey) kb.key = inpKey.value;
@@ -153,8 +153,8 @@ function saveKeybinds(){
         else if (sl) kb.event = sl.value;
         if (inpTopic && typeof kb.add_topic === 'function') kb.add_topic(inpTopic.value);
         else if (inpTopic) kb.topic = inpTopic.value;
-        if (inpMsg && typeof kb.add_massage === 'function') kb.add_massage(inpMsg.value);
-        else if (inpMsg) kb.massage = inpMsg.value;
+        if (inpMsg && typeof kb.add_message === 'function') kb.add_message(inpMsg.value);
+        else if (inpMsg) kb.message = inpMsg.value;
         keybind[i] = kb;
     }
 
@@ -164,12 +164,12 @@ function saveKeybinds(){
         const inpKey = document.getElementById(`${prefix}key${i}`);
         const sl = document.getElementById(`${prefix}event${i}`);
         const inpTopic = document.getElementById(`${prefix}topic${i}`);
-        const inpMsg = document.getElementById(`${prefix}massage${i}`);
-        let pb = padKeybind[i] || { key: GAME_BUTTONS[i] || '', event: 'down', topic: '', massage: '' };
+        const inpMsg = document.getElementById(`${prefix}message${i}`);
+        let pb = padKeybind[i] || { key: GAME_BUTTONS[i] || '', event: 'down', topic: '', message: '' };
         if (inpKey){ pb.key = inpKey.value; }
         if (sl){ pb.event = sl.value; }
         if (inpTopic){ pb.topic = inpTopic.value; }
-        if (inpMsg){ pb.massage = inpMsg.value; }
+        if (inpMsg){ pb.message = inpMsg.value; }
         padKeybind[i] = pb;
     }
 
@@ -180,23 +180,23 @@ function saveKeybinds(){
             const inpKey = document.getElementById(`${prefix}key${i}`);
             const sl = document.getElementById(`${prefix}event${i}`);
             const inpTopic = document.getElementById(`${prefix}topic${i}`);
-            const inpMsg = document.getElementById(`${prefix}massage${i}`);
-            let tb = tpBind[i] || { key: '', event: 'down', topic: '', massage: '' };
+            const inpMsg = document.getElementById(`${prefix}message${i}`);
+            let tb = tpBind[i] || { key: '', event: 'down', topic: '', message: '' };
             if (inpKey){ tb.key = inpKey.value; }
             if (sl){ tb.event = sl.value; }
             if (inpTopic){ tb.topic = inpTopic.value; }
-            if (inpMsg){ tb.massage = inpMsg.value; }
+            if (inpMsg){ tb.message = inpMsg.value; }
             tpBind[i] = tb;
         }
     }
 
     // 配列をオブジェクト配列に変換して保存（Keybind インスタンスとプレーンオブジェクトの両方に対応）
     function toPlain(item){
-        if (!item) return { key: '', event: '', topic: '', massage: '' };
+        if (!item) return { key: '', event: '', topic: '', message: '' };
         if (typeof item.get_key === 'function'){
-            return { key: item.get_key(), event: item.get_event(), topic: item.get_topic(), massage: item.get_massage() };
+            return { key: item.get_key(), event: item.get_event(), topic: item.get_topic(), message: item.get_message() };
         }
-        return { key: item.key || '', event: item.event || '', topic: item.topic || '', massage: item.massage || '' };
+        return { key: item.key || '', event: item.event || '', topic: item.topic || '', message: item.message || '' };
     }
 
     const arr = keybind.map(toPlain);
@@ -233,7 +233,7 @@ function loadKeybinds(){
                     kb.add_key(obj.key);
                     kb.add_event(obj.event);
                     kb.add_topic(obj.topic);
-                    kb.add_massage(obj.massage);
+                    kb.add_message(obj.message);
                     return kb;
                 });
                 // もし配列が空だったら空行を追加
@@ -272,7 +272,7 @@ function loadKeybinds(){
             kb.add_key(jsObj.key);
             kb.add_event(jsObj.event);
             kb.add_topic(jsObj.topic);
-            kb.add_massage(jsObj.massage);
+            kb.add_message(jsObj.message);
             keybind.push(kb);
         } catch(e){
             // ignore parse errors
@@ -306,10 +306,10 @@ function loadPadKeybinds(){
                         kb.add_key(obj.key);
                         kb.add_event(obj.event);
                         kb.add_topic(obj.topic);
-                        kb.add_massage(obj.massage);
+                        kb.add_message(obj.message);
                         return kb;
                     }catch(e){
-                        return { key: obj.key, event: obj.event, topic: obj.topic, massage: obj.massage };
+                        return { key: obj.key, event: obj.event, topic: obj.topic, message: obj.message };
                     }
                 });
             }
@@ -317,7 +317,7 @@ function loadPadKeybinds(){
     }
     // ensure we have entries for all GAME_BUTTONS
     for (let i = 0; i < GAME_BUTTONS.length; i++){
-        if (!padKeybind[i]) padKeybind[i] = { key: GAME_BUTTONS[i], event: 'down', topic: '', massage: '' };
+        if (!padKeybind[i]) padKeybind[i] = { key: GAME_BUTTONS[i], event: 'down', topic: '', message: '' };
         else padKeybind[i].key = GAME_BUTTONS[i];
     }
 }
@@ -336,7 +336,7 @@ function loadAllKeybinds(){
             kb.add_key(GAME_BUTTONS[i]);
             kb.add_event('down');
             kb.add_topic('');
-            kb.add_massage('');
+            kb.add_message('');
             padKeybind[i] = kb;
         } else {
             // if plain object, ensure key matches button label
@@ -358,10 +358,10 @@ function loadAllKeybinds(){
                         kb.add_key(obj.key);
                         kb.add_event(obj.event);
                         kb.add_topic(obj.topic);
-                        kb.add_massage(obj.massage);
+                        kb.add_message(obj.message);
                         return kb;
                     }catch(e){
-                        return { key: obj.key, event: obj.event, topic: obj.topic, massage: obj.massage };
+                        return { key: obj.key, event: obj.event, topic: obj.topic, message: obj.message };
                     }
                 });
             }
@@ -380,7 +380,7 @@ function initializePadKeybinds(){
     loadPadKeybinds();
     // 追加の安全措置: もし localStorage に何もなくても GAME_BUTTONS に合わせる
     for (let i = 0; i < GAME_BUTTONS.length; i++){
-        if (!padKeybind[i]) padKeybind[i] = { key: GAME_BUTTONS[i], event: 'down', topic: '', massage: '' };
+        if (!padKeybind[i]) padKeybind[i] = { key: GAME_BUTTONS[i], event: 'down', topic: '', message: '' };
         else padKeybind[i].key = GAME_BUTTONS[i];
     }
 }

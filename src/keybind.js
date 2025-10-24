@@ -7,7 +7,7 @@ class Keybind {
     key;
     event;
     topic;
-    massage;
+    message;
 
     add_key(key){
         this.key = key;
@@ -22,8 +22,8 @@ class Keybind {
         this.topic = topic;
     }
 
-    add_massage(massage){
-        this.massage = massage;
+    add_message(message){
+        this.message = message;
     }
 
     get_key(){
@@ -38,8 +38,8 @@ class Keybind {
         return this.topic;
     }
 
-    get_massage(){
-        return this.massage;
+    get_message(){
+        return this.message;
     }
 
     change_json(rw){
@@ -47,7 +47,7 @@ class Keybind {
             key : this.key,
             event : this.event,
             topic : this.topic,
-            massage : this.massage
+            message : this.message
         };
         let obj = JSON.stringify(objlist);
         localStorage.setItem(rw, obj);

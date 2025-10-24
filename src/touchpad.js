@@ -41,7 +41,7 @@ function renderTouchTable(){
 //         const evSel = document.getElementById(`tp_event${rowIdx}`);
 //         for (let o of evSel.options){ if (o.text === js.event){ o.selected = true; break; } }
 //         document.getElementById(`tp_topic${rowIdx}`).value = js.topic;
-//         document.getElementById(`tp_massage${rowIdx}`).value = js.massage;
+//         document.getElementById(`tp_message${rowIdx}`).value = js.message;
 //         tpBind[i] = js;
 //         // add another empty row for convenience
 //         if (rowIdx === len) tpAdd();
@@ -72,7 +72,7 @@ function tpPublishFor(buttonName, phase){
             const js = JSON.parse(json);
             if (js.key === buttonName && js.event === phase){
                 if (typeof client !== 'undefined' && client){
-                    client.publish(js.topic, js.massage);
+                    client.publish(js.topic, js.message);
                 }
             }
         }
