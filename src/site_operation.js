@@ -47,7 +47,6 @@ function switchgpViews(){
         settings.classList.remove('is-active');
         operate.classList.add('is-active');
         btn.textContent = 'settings';
-        renderPadTable();
     } else {
         operate.classList.remove('is-active');
         settings.classList.add('is-active');

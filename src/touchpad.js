@@ -57,7 +57,6 @@ function tpToggleViews(){
         settings.classList.remove('is-active');
         operate.classList.add('is-active');
         btn.textContent = 'settings';
-        renderTouchTable();
     } else {
         operate.classList.remove('is-active');
         settings.classList.add('is-active');

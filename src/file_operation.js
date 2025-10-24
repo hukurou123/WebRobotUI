@@ -66,9 +66,29 @@ function importJSON(inputEl){
         .then(() => {
                 showToast && showToast('import successfully!');
                 // 読み込んだらテーブルなどを再描画
-                if (typeof loadKeybinds === 'function'){
-                    try{ loadKeybinds(); renderTable(); } catch(e){}
-                }
+                // 再描画: 可能ならまとめて復元する関数を呼ぶ（loadAllKeybinds を優先）
+                try{
+                    if (typeof loadAllKeybinds === 'function'){
+                        loadAllKeybinds();
+                        if (typeof renderTable === 'function') renderTable();
+                        if (typeof renderPadTable === 'function') renderPadTable();
+                        if (typeof renderTouchTable === 'function') renderTouchTable();
+                    } else {
+                        if (typeof loadKeybinds === 'function'){
+                            loadKeybinds();
+                            if (typeof renderTable === 'function') renderTable();
+                        }
+                        if (typeof loadPadKeybinds === 'function'){
+                            loadPadKeybinds();
+                            if (typeof renderPadTable === 'function') renderPadTable();
+                        }
+                        // touchpad.js may expose tpLoad
+                        if (typeof tpLoad === 'function'){
+                            tpLoad();
+                            if (typeof renderTouchTable === 'function') renderTouchTable();
+                        }
+                    }
+                }catch(e){ console.warn('post-import render error', e); }
                 // BrokerIP / BrokerPORT があればフォームに反映
                 try{
                     const ip = localStorage.getItem('BrokerIP');
