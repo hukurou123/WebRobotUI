@@ -66,7 +66,7 @@ li{
     text-decoration: none;
     color: #222222;
     margin-right: 1px;
-    width: 30px;
+    width: 45px;
     text-align: center;
     border-radius: 8px 8px 0px 0px;
 }
@@ -372,7 +372,7 @@ button:active{
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 12px;
+    gap: 35px;
 }
 .center-spacer{ width: 40px; height: 40px; }
 .dpad-btn{

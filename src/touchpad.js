@@ -26,27 +26,27 @@ function renderTouchTable(){
     });
 }
 
-function tpLoad(){
-    // ensure at least one row
-    tpAdd();
-    const len = tpLengthGet();
-    for (let i=0; i<len; i++){
-        const json = localStorage.getItem(tpStorageKey(i));
-        if (!json) continue;
-        const js = JSON.parse(json);
-        // ensure row exists
-        if (tpTable().rows.length-1 < i+1) tpAdd();
-        const rowIdx = i+1;
-        document.getElementById(`tp_button${rowIdx}`).value = js.key;
-        const evSel = document.getElementById(`tp_event${rowIdx}`);
-        for (let o of evSel.options){ if (o.text === js.event){ o.selected = true; break; } }
-        document.getElementById(`tp_topic${rowIdx}`).value = js.topic;
-        document.getElementById(`tp_massage${rowIdx}`).value = js.massage;
-        tpBind[i] = js;
-        // add another empty row for convenience
-        if (rowIdx === len) tpAdd();
-    }
-}
+// function tpLoad(){
+//     // ensure at least one row
+//     tpAdd();
+//     const len = tpLengthGet();
+//     for (let i=0; i<len; i++){
+//         const json = localStorage.getItem(tpStorageKey(i));
+//         if (!json) continue;
+//         const js = JSON.parse(json);
+//         // ensure row exists
+//         if (tpTable().rows.length-1 < i+1) tpAdd();
+//         const rowIdx = i+1;
+//         document.getElementById(`tp_button${rowIdx}`).value = js.key;
+//         const evSel = document.getElementById(`tp_event${rowIdx}`);
+//         for (let o of evSel.options){ if (o.text === js.event){ o.selected = true; break; } }
+//         document.getElementById(`tp_topic${rowIdx}`).value = js.topic;
+//         document.getElementById(`tp_massage${rowIdx}`).value = js.massage;
+//         tpBind[i] = js;
+//         // add another empty row for convenience
+//         if (rowIdx === len) tpAdd();
+//     }
+// }
 
 function tpToggleViews(){
     const settings = document.getElementById('tp_settings');
@@ -57,6 +57,7 @@ function tpToggleViews(){
         settings.classList.remove('is-active');
         operate.classList.add('is-active');
         btn.textContent = 'settings';
+        renderTouchTable();
     } else {
         operate.classList.remove('is-active');
         settings.classList.add('is-active');

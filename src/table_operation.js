@@ -82,7 +82,11 @@ function renderGenericTable({tableId, data, options = {}, onSaveRow}){
         } else if(!keyEditable && keySelect){
             const selKey = document.createElement('select');
             ['Up','Down', 'Left', 'Right'].forEach(opt => {
-                const option = document.createElement('option'); option.text = opt; if ((bind.event || '') === opt) option.selected = true; selKey.appendChild(option);
+                const option = document.createElement('option');
+                option.text = opt;
+                // touchpad のキーは bind.key に保存されているはずなので、bind.key を基準に選択を設定
+                if ((bind.key || '') === opt) option.selected = true;
+                selKey.appendChild(option);
             });
             selKey.id = `${idPrefix}key${i}`;
             selKey.classList.add('cell');
@@ -295,7 +299,19 @@ function loadPadKeybinds(){
         try {
             const parsed = JSON.parse(data);
             if (Array.isArray(parsed)) {
-                padKeybind = parsed.map(obj => ({ key: obj.key, event: obj.event, topic: obj.topic, massage: obj.massage }));
+                // restore as Keybind instances if possible
+                padKeybind = parsed.map(obj => {
+                    try{
+                        const kb = new Keybind();
+                        kb.add_key(obj.key);
+                        kb.add_event(obj.event);
+                        kb.add_topic(obj.topic);
+                        kb.add_massage(obj.massage);
+                        return kb;
+                    }catch(e){
+                        return { key: obj.key, event: obj.event, topic: obj.topic, massage: obj.massage };
+                    }
+                });
             }
         } catch(e){ console.error('failed to parse pad_keybinds', e); }
     }
@@ -303,6 +319,58 @@ function loadPadKeybinds(){
     for (let i = 0; i < PAD_BUTTONS.length; i++){
         if (!padKeybind[i]) padKeybind[i] = { key: PAD_BUTTONS[i], event: 'down', topic: '', massage: '' };
         else padKeybind[i].key = PAD_BUTTONS[i];
+    }
+}
+
+// load all three kinds of bindings from localStorage (key, pad, touch)
+function loadAllKeybinds(){
+    // main keybinds (existing logic)
+    loadKeybinds();
+
+    // pad keybinds
+    loadPadKeybinds();
+    // ensure entries exist for all PAD_BUTTONS
+    for (let i = 0; i < PAD_BUTTONS.length; i++){
+        if (!padKeybind[i]){
+            const kb = new Keybind();
+            kb.add_key(PAD_BUTTONS[i]);
+            kb.add_event('down');
+            kb.add_topic('');
+            kb.add_massage('');
+            padKeybind[i] = kb;
+        } else {
+            // if plain object, ensure key matches button label
+            if (typeof padKeybind[i].get_key !== 'function') padKeybind[i].key = PAD_BUTTONS[i];
+        }
+    }
+
+    // touchpad bindings: try to restore tp_keybinds if present
+    const tpData = localStorage.getItem('tp_keybinds');
+    if (tpData){
+        try{
+            const parsed = JSON.parse(tpData);
+            if (Array.isArray(parsed)){
+                // ensure tpBind exists (touchpad.js defines tpBind but it's global)
+                if (typeof tpBind === 'undefined') window.tpBind = [];
+                tpBind = parsed.map(obj => {
+                    try{
+                        const kb = new Keybind();
+                        kb.add_key(obj.key);
+                        kb.add_event(obj.event);
+                        kb.add_topic(obj.topic);
+                        kb.add_massage(obj.massage);
+                        return kb;
+                    }catch(e){
+                        return { key: obj.key, event: obj.event, topic: obj.topic, massage: obj.massage };
+                    }
+                });
+            }
+        }catch(e){ console.error('failed to parse tp_keybinds', e); }
+    }
+    // ensure at least one touch row exists so UI has something
+    if (typeof tpBind === 'undefined' || tpBind.length === 0){
+        if (typeof tpBind === 'undefined') tpBind = [];
+        tpBind.push(new Keybind());
     }
 }
 
@@ -323,10 +391,9 @@ function savePadKeybinds(){
 
 // 読み込み時に表を初期化
 window.onload = () => {
-    loadKeybinds();
+    // load all bindings then render
+    loadAllKeybinds();
     renderTable();
-    // initialize padKeybinds to the controller buttons and render
-    initializePadKeybinds();
     renderPadTable();
     renderTouchTable();
     // loadPadKeybinds();
