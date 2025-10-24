@@ -165,3 +165,17 @@ function btnUpHandler(/* event */) {
     safeSetText('buttonstatus', 'released');
 }
 
+// 表を描画する関数 (ゲームパッド用)
+function renderPadTable(){
+    renderGenericTable({
+        tableId: 'pad_tbl',
+        data: padKeybind,
+        options: {
+            includeIndex: false,
+            includeDelete: false,
+            keyEditable: false,
+            keySelect: false,
+            idPrefix: 'pad_'
+        },
+    });
+}

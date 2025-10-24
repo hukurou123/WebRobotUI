@@ -3,11 +3,18 @@
     表の行追加、削除、スクロール処理
 */
 
+/*
+TODO: 押されているキーを強調表示する機能
+    コントローラーのボタン分のインジケーターを表示する
+*/
+
 
 let tbl = document.getElementById("tbl");
 let pad_tbl = document.getElementById("pad_tbl");
+let tp_tbl = document.getElementById("tp_tbl");
 var keybind = [];
 var padKeybind = [];
+var cellId = ['', 'pad_', 'tp_'];
 const PAD_BUTTONS = ['A','B','X','Y','LB','RB','LT','RT','Back','Start','L3','R3','Up','Down','Left','Right', 'Left X', 'Left Y', 'Right X', 'Right Y'];
 
 // 行を追加する関数
@@ -38,29 +45,16 @@ function renderTable(){
             includeIndex: true,
             includeDelete: true,
             keyEditable: true,
+            keySelect: false,
             idPrefix: ''
         }
-    });
-}
-
-// 表を描画する関数 (ゲームパッド用)
-function renderPadTable(){
-    renderGenericTable({
-        tableId: 'pad_tbl',
-        data: padKeybind,
-        options: {
-            includeIndex: false,
-            includeDelete: false,
-            keyEditable: false,
-            idPrefix: 'pad_'
-        },
     });
 }
 
 
 // 汎用的テーブルレンダラ
 function renderGenericTable({tableId, data, options = {}, onSaveRow}){
-    const { includeIndex = false, includeDelete = false, keyEditable = true, idPrefix = '' } = options;
+    const { includeIndex = false, includeDelete = false, keyEditable = true, keySelect = false, idPrefix = '' } = options;
     const tblEl = document.getElementById(tableId);
     if (!tblEl) return;
 
@@ -85,6 +79,14 @@ function renderGenericTable({tableId, data, options = {}, onSaveRow}){
             inpKey.classList.add('cell');
             inpKey.value = (typeof bind.get_key === 'function') ? bind.get_key() || '' : (bind.key || '');
             tdKey.appendChild(inpKey);
+        } else if(!keyEditable && keySelect){
+            const selKey = document.createElement('select');
+            ['Up','Down', 'Left', 'Right'].forEach(opt => {
+                const option = document.createElement('option'); option.text = opt; if ((bind.event || '') === opt) option.selected = true; selKey.appendChild(option);
+            });
+            selKey.id = `${idPrefix}key${i}`;
+            selKey.classList.add('cell');
+            tdKey.appendChild(selKey);
         } else {
             tdKey.textContent = bind.key || '';
             tdKey.id = `${idPrefix}key${i}`;
@@ -126,53 +128,91 @@ function renderGenericTable({tableId, data, options = {}, onSaveRow}){
     });
 
     // scroll (if this table is the main one, keep legacy behavior)
-    if (tableId === 'tbl') scrollToBottom();
+    if (tableId === 'tbl') scrollToBottom(tbl);
+    else if (tableId === 'tp_tbl') scrollToBottom(tp_tbl);
 }
 
 
 // localStrageに保存する関数
 function saveKeybinds(){
-    // 現在の入力状態を読み取って keybind を更新
+    // 現在の入力状態を読み取って keybind / padKeybind / tpBind を個別に更新
+    // keybind (main keys)
     for (let i = 0; i < keybind.length; i++){
         const inpKey = document.getElementById(`key${i}`);
         const sl = document.getElementById(`event${i}`);
         const inpTopic = document.getElementById(`topic${i}`);
         const inpMsg = document.getElementById(`massage${i}`);
         const kb = keybind[i] || new Keybind();
-
-        if (inpKey) kb.add_key(inpKey.value);
-        if (sl) kb.add_event(sl.value);
-        if (inpTopic) kb.add_topic(inpTopic.value);
-        if (inpMsg) kb.add_massage(inpMsg.value);
-
+        if (inpKey && typeof kb.add_key === 'function') kb.add_key(inpKey.value);
+        else if (inpKey) kb.key = inpKey.value;
+        if (sl && typeof kb.add_event === 'function') kb.add_event(sl.value);
+        else if (sl) kb.event = sl.value;
+        if (inpTopic && typeof kb.add_topic === 'function') kb.add_topic(inpTopic.value);
+        else if (inpTopic) kb.topic = inpTopic.value;
+        if (inpMsg && typeof kb.add_massage === 'function') kb.add_massage(inpMsg.value);
+        else if (inpMsg) kb.massage = inpMsg.value;
         keybind[i] = kb;
     }
 
-    // map: 配列の各要素に関数を適用して、新しいmapを作る
-    // keybindのインスタンスをオブジェクトに変換して配列にする
-    const arr = keybind.map(k => ({ 
-        key: k.get_key(), 
-        event: k.get_event(), 
-        topic: k.get_topic(), 
-        massage: k.get_massage() 
-    }));
+    // padKeybind (gamepad)
+    for (let i = 0; i < padKeybind.length; i++){
+        const prefix = 'pad_';
+        const inpKey = document.getElementById(`${prefix}key${i}`);
+        const sl = document.getElementById(`${prefix}event${i}`);
+        const inpTopic = document.getElementById(`${prefix}topic${i}`);
+        const inpMsg = document.getElementById(`${prefix}massage${i}`);
+        let pb = padKeybind[i] || { key: PAD_BUTTONS[i] || '', event: 'down', topic: '', massage: '' };
+        if (inpKey){ pb.key = inpKey.value; }
+        if (sl){ pb.event = sl.value; }
+        if (inpTopic){ pb.topic = inpTopic.value; }
+        if (inpMsg){ pb.massage = inpMsg.value; }
+        padKeybind[i] = pb;
+    }
+
+    // tpBind (touchpad)
+    if (typeof tpBind !== 'undefined'){
+        for (let i = 0; i < tpBind.length; i++){
+            const prefix = 'tp_';
+            const inpKey = document.getElementById(`${prefix}key${i}`);
+            const sl = document.getElementById(`${prefix}event${i}`);
+            const inpTopic = document.getElementById(`${prefix}topic${i}`);
+            const inpMsg = document.getElementById(`${prefix}massage${i}`);
+            let tb = tpBind[i] || { key: '', event: 'down', topic: '', massage: '' };
+            if (inpKey){ tb.key = inpKey.value; }
+            if (sl){ tb.event = sl.value; }
+            if (inpTopic){ tb.topic = inpTopic.value; }
+            if (inpMsg){ tb.massage = inpMsg.value; }
+            tpBind[i] = tb;
+        }
+    }
+
+    // 配列をオブジェクト配列に変換して保存（Keybind インスタンスとプレーンオブジェクトの両方に対応）
+    function toPlain(item){
+        if (!item) return { key: '', event: '', topic: '', massage: '' };
+        if (typeof item.get_key === 'function'){
+            return { key: item.get_key(), event: item.get_event(), topic: item.get_topic(), massage: item.get_massage() };
+        }
+        return { key: item.key || '', event: item.event || '', topic: item.topic || '', massage: item.massage || '' };
+    }
+
+    const arr = keybind.map(toPlain);
+    const padarr = padKeybind.map(toPlain);
+    const tparr = (typeof tpBind !== 'undefined') ? tpBind.map(toPlain) : [];
+
+    // ローカルストレージの数字キーは古い保存形式なので掃除
     const toRemove = [];
-    // chatGPTとcopilot2つのAIを使用したので繰り返しの書き方が違う
-    // chatGPTはforEach使いがち
-    // すべてのlocalStorageのキーを確認して、数字だけのキーを削除する
     for (let i = 0; i < localStorage.length; i++){
         const k = localStorage.key(i);
         if (!k) continue;
         if (/^[0-9]+$/.test(k)) toRemove.push(k);
     }
     toRemove.forEach(k => localStorage.removeItem(k));
-    // 配列をJSON文字列に変換してlocalStrageに保存
-    localStorage.setItem('keybinds', JSON.stringify(arr));
 
-    try{
-        showToast('Saved Successfully!');
-    }catch(e){
-    }
+    localStorage.setItem('keybinds', JSON.stringify(arr));
+    localStorage.setItem('pad_keybinds', JSON.stringify(padarr));
+    localStorage.setItem('tp_keybinds', JSON.stringify(tparr));
+
+    try{ showToast('Saved Successfully!'); }catch(e){ }
 }
 
 // localStrageから読み込む関数
@@ -239,8 +279,8 @@ function loadKeybinds(){
 }
 
 // 最下行にスクロールする関数
-function scrollToBottom(){
-    const obj = tbl.parentElement;
+function scrollToBottom(scrollTarget){
+    const obj = scrollTarget.parentElement;
     obj.scrollTop = obj.scrollHeight;
 }
 
@@ -288,6 +328,7 @@ window.onload = () => {
     // initialize padKeybinds to the controller buttons and render
     initializePadKeybinds();
     renderPadTable();
+    renderTouchTable();
     // loadPadKeybinds();
     // renderPadTable();
 };

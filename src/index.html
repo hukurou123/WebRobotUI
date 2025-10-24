@@ -62,8 +62,8 @@
             </div>
         </div>
         <div id="GamePad" class="area">
-            <div id="swich_button">
-                <button id="swich" onclick="switchgpViews()">operate</button>
+            <div class="swich_button">
+                <button id="gp-toggle" class="toggle" onclick="switchgpViews()">operate</button>
             </div>
 
             <!-- Setting View -->
@@ -88,9 +88,8 @@
             </div>
         </div>
         <div id="Touch" class="area">
-            <div class="touchpad-header">
-                <button id="tp_toggle" class="tp-toggle" title="切り替え">操作</button>
-                <h2>TouchPad</h2>
+            <div class="swich_button">
+                <button id="tp-toggle" class="toggle" onclick="tpToggleViews()">operate</button>
             </div>
 
             <!-- Settings View -->
@@ -103,8 +102,8 @@
                             <th>event</th> 
                             <th>topic</th> 
                             <th>massage</th>
-                            <th id="tp_confbtn"> </th>
-                            <th id="tp_delbtn"> </th>
+                            <!-- <th id="tp_confbtn"> </th> -->
+                            <th id="delbtn"> </th>
                         </tr>
                     </table>
                 </div>

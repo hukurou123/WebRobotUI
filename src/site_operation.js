@@ -41,7 +41,7 @@ document.querySelectorAll('.tab a').forEach(function (tab) {
 function switchgpViews(){
     const settings = document.getElementById('pad_settings');
     const operate = document.getElementById('pad_operation');
-    const btn = document.getElementById('swich');
+    const btn = document.getElementById('gp-toggle');
     const settingsActive = settings.classList.contains('is-active');
     if (settingsActive){
         settings.classList.remove('is-active');
