@@ -356,7 +356,7 @@ button:active{
 .tp-view{ display: none; opacity: 0; }
 .tp-view.is-active{ display: block; opacity: 1; }
 
-#pad_operation{
+#gp_operation{
     padding: 3.3%;
 }
 

@@ -10,12 +10,12 @@ TODO: 押されているキーを強調表示する機能
 
 
 let tbl = document.getElementById("tbl");
-let pad_tbl = document.getElementById("pad_tbl");
+let gp_tbl = document.getElementById("gp_tbl");
 let tp_tbl = document.getElementById("tp_tbl");
 var keybind = [];
 var padKeybind = [];
-var cellId = ['', 'pad_', 'tp_'];
-const PAD_BUTTONS = ['A','B','X','Y','LB','RB','LT','RT','Back','Start','L3','R3','Up','Down','Left','Right', 'Left X', 'Left Y', 'Right X', 'Right Y'];
+var cellId = ['', 'gp_', 'tp_'];
+const GAME_BUTTONS = ['A','B','X','Y','LB','RB','LT','RT','Back','Start','L3','R3','Up','Down','Left','Right', 'Left X', 'Left Y', 'Right X', 'Right Y'];
 
 // 行を追加する関数
 function add(){
@@ -160,12 +160,12 @@ function saveKeybinds(){
 
     // padKeybind (gamepad)
     for (let i = 0; i < padKeybind.length; i++){
-        const prefix = 'pad_';
+        const prefix = 'gp_';
         const inpKey = document.getElementById(`${prefix}key${i}`);
         const sl = document.getElementById(`${prefix}event${i}`);
         const inpTopic = document.getElementById(`${prefix}topic${i}`);
         const inpMsg = document.getElementById(`${prefix}massage${i}`);
-        let pb = padKeybind[i] || { key: PAD_BUTTONS[i] || '', event: 'down', topic: '', massage: '' };
+        let pb = padKeybind[i] || { key: GAME_BUTTONS[i] || '', event: 'down', topic: '', massage: '' };
         if (inpKey){ pb.key = inpKey.value; }
         if (sl){ pb.event = sl.value; }
         if (inpTopic){ pb.topic = inpTopic.value; }
@@ -213,7 +213,7 @@ function saveKeybinds(){
     toRemove.forEach(k => localStorage.removeItem(k));
 
     localStorage.setItem('keybinds', JSON.stringify(arr));
-    localStorage.setItem('pad_keybinds', JSON.stringify(padarr));
+    localStorage.setItem('gp_keybinds', JSON.stringify(padarr));
     localStorage.setItem('tp_keybinds', JSON.stringify(tparr));
 
     try{ showToast('Saved Successfully!'); }catch(e){ }
@@ -293,7 +293,7 @@ function scrollToBottom(scrollTarget){
 
 // --- pad table handling (fixed rows, no add/remove) -------------------------
 function loadPadKeybinds(){
-    const data = localStorage.getItem('pad_keybinds');
+    const data = localStorage.getItem('gp_keybinds');
     padKeybind = [];
     if (data) {
         try {
@@ -313,12 +313,12 @@ function loadPadKeybinds(){
                     }
                 });
             }
-        } catch(e){ console.error('failed to parse pad_keybinds', e); }
+        } catch(e){ console.error('failed to parse gp_keybinds', e); }
     }
-    // ensure we have entries for all PAD_BUTTONS
-    for (let i = 0; i < PAD_BUTTONS.length; i++){
-        if (!padKeybind[i]) padKeybind[i] = { key: PAD_BUTTONS[i], event: 'down', topic: '', massage: '' };
-        else padKeybind[i].key = PAD_BUTTONS[i];
+    // ensure we have entries for all GAME_BUTTONS
+    for (let i = 0; i < GAME_BUTTONS.length; i++){
+        if (!padKeybind[i]) padKeybind[i] = { key: GAME_BUTTONS[i], event: 'down', topic: '', massage: '' };
+        else padKeybind[i].key = GAME_BUTTONS[i];
     }
 }
 
@@ -329,18 +329,18 @@ function loadAllKeybinds(){
 
     // pad keybinds
     loadPadKeybinds();
-    // ensure entries exist for all PAD_BUTTONS
-    for (let i = 0; i < PAD_BUTTONS.length; i++){
+    // ensure entries exist for all GAME_BUTTONS
+    for (let i = 0; i < GAME_BUTTONS.length; i++){
         if (!padKeybind[i]){
             const kb = new Keybind();
-            kb.add_key(PAD_BUTTONS[i]);
+            kb.add_key(GAME_BUTTONS[i]);
             kb.add_event('down');
             kb.add_topic('');
             kb.add_massage('');
             padKeybind[i] = kb;
         } else {
             // if plain object, ensure key matches button label
-            if (typeof padKeybind[i].get_key !== 'function') padKeybind[i].key = PAD_BUTTONS[i];
+            if (typeof padKeybind[i].get_key !== 'function') padKeybind[i].key = GAME_BUTTONS[i];
         }
     }
 
@@ -374,19 +374,19 @@ function loadAllKeybinds(){
     }
 }
 
-// ページ初期化時に padKeybind を PAD_BUTTONS の数だけ用意する（未保存ならデフォルト）
+// ページ初期化時に padKeybind を GAME_BUTTONS の数だけ用意する（未保存ならデフォルト）
 function initializePadKeybinds(){
     // 既に loadPadKeybinds() を使っている場合はそれを呼ぶ
     loadPadKeybinds();
-    // 追加の安全措置: もし localStorage に何もなくても PAD_BUTTONS に合わせる
-    for (let i = 0; i < PAD_BUTTONS.length; i++){
-        if (!padKeybind[i]) padKeybind[i] = { key: PAD_BUTTONS[i], event: 'down', topic: '', massage: '' };
-        else padKeybind[i].key = PAD_BUTTONS[i];
+    // 追加の安全措置: もし localStorage に何もなくても GAME_BUTTONS に合わせる
+    for (let i = 0; i < GAME_BUTTONS.length; i++){
+        if (!padKeybind[i]) padKeybind[i] = { key: GAME_BUTTONS[i], event: 'down', topic: '', massage: '' };
+        else padKeybind[i].key = GAME_BUTTONS[i];
     }
 }
 
 function savePadKeybinds(){
-    localStorage.setItem('pad_keybinds', JSON.stringify(padKeybind));
+    localStorage.setItem('gp_keybinds', JSON.stringify(padKeybind));
 }
 
 // 読み込み時に表を初期化

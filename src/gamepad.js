@@ -168,14 +168,14 @@ function btnUpHandler(/* event */) {
 // 表を描画する関数 (ゲームパッド用)
 function renderPadTable(){
     renderGenericTable({
-        tableId: 'pad_tbl',
+        tableId: 'gp_tbl',
         data: padKeybind,
         options: {
             includeIndex: false,
             includeDelete: false,
             keyEditable: false,
             keySelect: false,
-            idPrefix: 'pad_'
+            idPrefix: 'gp_'
         },
     });
 }

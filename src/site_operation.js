@@ -39,8 +39,8 @@ document.querySelectorAll('.tab a').forEach(function (tab) {
 
 // GamePadの設定画面と操作画面を切り替える関数
 function switchgpViews(){
-    const settings = document.getElementById('pad_settings');
-    const operate = document.getElementById('pad_operation');
+    const settings = document.getElementById('gp-settings');
+    const operate = document.getElementById('gp-operation');
     const btn = document.getElementById('gp-toggle');
     const settingsActive = settings.classList.contains('is-active');
     if (settingsActive){
