@@ -1,11 +1,10 @@
-// TouchPad settings and operation logic
+/*
+    touchpad.js
+    タッチパッドに関する処理
+*/
 
 const tpTable = () => document.getElementById('tp_tbl');
 let tpBind = [];
-
-function tpStorageKey(i){ return `tp:${i}`; }
-function tpLengthGet(){ return parseInt(localStorage.getItem('tp:length') || '0', 10); }
-function tpLengthSet(v){ localStorage.setItem('tp:length', String(v)); }
 
 function tpAdd(){
     // 再描画する前に今の入力内容をkeybind配列に保存
@@ -34,57 +33,52 @@ function loadTouchKeybinds(){
     tpBind = loadKeybindArray('tp_keybinds', true);
 }
 
-function tpToggleViews(){
-    const settings = document.getElementById('tp_settings');
-    const operate = document.getElementById('tp_operate');
-    const btn = document.getElementById('tp-toggle');
-    const settingsActive = settings.classList.contains('is-active');
-    if (settingsActive){
-        settings.classList.remove('is-active');
-        operate.classList.add('is-active');
-        btn.textContent = 'settings';
-    } else {
-        operate.classList.remove('is-active');
-        settings.classList.add('is-active');
-        btn.textContent = 'operate';
-    }
-}
+// タッチパッドが押されたときに通信する処理
+// function tpPublishFor(buttonName, phase){
+//     try{
+//         for (let i=0; i<tpLengthGet(); i++){
+//             const json = localStorage.getItem(tpStorageKey(i));
+//             if (!json) continue;
+//             const js = JSON.parse(json);
+//             if (js.key === buttonName && js.event === phase){
+//                 if (typeof client !== 'undefined' && client){
+//                     client.publish(js.topic, js.message);
+//                 }
+//             }
+//         }
+//     }catch(e){ console.warn('tp publish error', e); }
+// }
 
-function tpPublishFor(buttonName, phase){
-    try{
-        for (let i=0; i<tpLengthGet(); i++){
-            const json = localStorage.getItem(tpStorageKey(i));
-            if (!json) continue;
-            const js = JSON.parse(json);
-            if (js.key === buttonName && js.event === phase){
-                if (typeof client !== 'undefined' && client){
-                    client.publish(js.topic, js.message);
-                }
-            }
-        }
-    }catch(e){ console.warn('tp publish error', e); }
-}
+// document.addEventListener('keydown', event => {
+//     setupKeyPublish(tpBind, 'tp_tbl', 'down', event);
+// });
 
+// document.addEventListener('keyup', event => {
+//     setupKeyPublish(tpBind, 'tp_tbl', 'up', event);
+// });
+
+// タッチパッドが押されたときの処理を設定
 function tpBindButtonPress(el){
     const name = el.dataset.button;
-    const down = () => tpPublishFor(name,'down');
-    const up = () => tpPublishFor(name,'up');
+    // const down = () => tpPublishFor(name,'down');
+    const down = () => setupKeyPublish(tpBind, 'tp_tbl', 'down', name);
+    // const up = () => tpPublishFor(name,'up');
+    const up = () => setupKeyPublish(tpBind, 'tp_tbl', 'up', name);
 
-    // touch
+    // touch 
+    // 3つ目の項目は意図しないタッチの中断があった場合(別アプリに切り替えた時とか)に発火するやつ
+    // 安全性としては必要だけど今はいいや
     el.addEventListener('touchstart', e => { e.preventDefault(); down(); }, {passive:false});
     el.addEventListener('touchend', e => { e.preventDefault(); up(); }, {passive:false});
-    el.addEventListener('touchcancel', e => { e.preventDefault(); up(); }, {passive:false});
+    // el.addEventListener('touchcancel', e => { e.preventDefault(); up(); }, {passive:false});
     // mouse
     el.addEventListener('mousedown', down);
     el.addEventListener('mouseup', up);
-    el.addEventListener('mouseleave', up);
+    // el.addEventListener('mouseleave', up);
 }
 
+// 画面がロードされたときの処理
 window.addEventListener('load', () => {
-    // prepare settings table
-    tpLoad();
-    const toggle = document.getElementById('tp_toggle');
-    // if (toggle){ toggle.addEventListener('click', tpToggleViews); }
     // bind dpad buttons
     ['tp_up','tp_down','tp_left','tp_right'].forEach(id => {
         const el = document.getElementById(id);

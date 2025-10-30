@@ -37,11 +37,11 @@ document.querySelectorAll('.tab a').forEach(function (tab) {
     });
 });
 
-// GamePadの設定画面と操作画面を切り替える関数
-function switchgpViews(){
-    const settings = document.getElementById('gp-settings');
-    const operate = document.getElementById('gp-operation');
-    const btn = document.getElementById('gp-toggle');
+// 汎用設定画面と操作画面を切り替える関数
+function ToggleViews(idName){
+    const settings = document.getElementById(`${idName}settings`);
+    const operate = document.getElementById(`${idName}operation`);
+    const btn = document.getElementById(`${idName}toggle`);
     const settingsActive = settings.classList.contains('is-active');
     if (settingsActive){
         settings.classList.remove('is-active');

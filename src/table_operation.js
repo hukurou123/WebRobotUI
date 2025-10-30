@@ -233,11 +233,18 @@ function loadAllKeybinds(){
 
 // ページ読み込み時に表を初期化
 window.onload = () => {
-    // load all bindings then render
+    // localStrage通りに表を復元
     loadAllKeybinds();
     renderTable();
     renderGameTable();
     renderTouchTable();
+    // ipとポート番号をlocalStrageに保存されてる通りに復元
+    const ip = localStorage.getItem('BrokerIP');
+    const port = localStorage.getItem('BrokerPORT');
+    const ipEl = document.getElementById('ip_name');
+    const portEl = document.getElementById('port_name');
+    if (ip && ipEl) ipEl.value = ip;
+    if (port && portEl) portEl.value = port;
 };
 
 // トースト通知を表示する関数

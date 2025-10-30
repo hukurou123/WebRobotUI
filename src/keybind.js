@@ -93,3 +93,14 @@ function renderTable(){
 function loadKeybinds() {
     keybind = loadKeybindArray('keybinds', true);
 }
+
+// 登録されたキーが押された時MQTT通信する
+document.addEventListener('keydown', event => {
+    const keyName = event.key;
+    setupKeyPublish(keybind, 'tbl', 'down', keyName);
+});
+
+document.addEventListener('keyup', event => {
+    const keyName = event.key;
+    setupKeyPublish(keybind, 'tbl', 'up', keyName);
+});

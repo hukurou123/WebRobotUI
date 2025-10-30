@@ -57,8 +57,11 @@ const isEmpty = (obj) => {
 }
 
 
-// 登録されたキーが押された時MQTT通信する
-document.addEventListener('keydown', event => {
+// 任意の配列とテーブルIDを使ってキーイベントでMQTT通信
+function setupKeyPublish(array, tableId, eventType, keyName) {
+    const tbl = document.getElementById(tableId);
+    if (!tbl) return;
+
     // 今フォーカスされている要素を取得
     const active = document.activeElement;
     // テキスト入力中なら何もしない
@@ -67,41 +70,20 @@ document.addEventListener('keydown', event => {
     }
 
     //配列の長さ分だけ繰り返し
-    for (let i=0; i<tbl.rows.length-1; i++){
+    for (let i = 0; i < array.length; i++) {
+        const kb = array[i];
+        //キーボードイベントのときはevent.keyを使う
+        const keyToCheck = keyName || (eventType.key ? eventType.key : null);
         //押されたキーが配列に登録されているなら
-        if (event.key == keybind[i].get_key() && keybind[i].get_event()=="down"){
-            console.log(event.key+"です");
-            if (client && typeof client.publish === 'function'){
-                client.publish(keybind[i].get_topic(), keybind[i].get_message());
+        if (kb.get_key() === keyToCheck && kb.get_event() === eventType) {
+            console.log(keyToCheck + " です");
+            if (client && typeof client.publish === 'function') {
+                client.publish(kb.get_topic(), kb.get_message());
             } else {
                 console.warn('publish skipped: client not ready');
             }
         }
     }
-})
-
-
-// 登録されたキーが離された時MQTT通信する
-document.addEventListener('keyup', event => {
-    // 今フォーカスされている要素を取得
-    const active = document.activeElement;
-    // テキスト入力中なら何もしない
-    if (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable) {
-        return;
-    }
-
-    //配列の長さ分だけ繰り返し
-    for (let i=0; i<tbl.rows.length-1; i++){
-        //押されたキーが配列に登録されているなら
-        if (event.key == keybind[i].get_key() && keybind[i].get_event()=="up"){
-            // console.log(event.key+"です");
-            if (client && typeof client.publish === 'function'){
-                client.publish(keybind[i].get_topic(), keybind[i].get_message());
-            } else {
-                console.warn('publish skipped: client not ready');
-            }
-        }
-    }
-})
+}
 
 
