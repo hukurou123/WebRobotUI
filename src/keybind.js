@@ -61,12 +61,14 @@ class Keybind {
     }
 }
 
-// --------- instance + handlers ------------------------------------------------
+// --------- sonota iroiro ------------------------------------------------
 
 var keybind = [];
 
 // 表を追加する関数
 function add(){
+    // 再描画する前に今の入力内容をkeybind配列に保存
+    syncInputsToKeybind();
     keybind.push(new Keybind());
     renderTable();
 }
@@ -85,4 +87,9 @@ function renderTable(){
             idPrefix: ''
         }
     });
+}
+
+// 汎用ロード関数を利用してlocalStrageから読み出す
+function loadKeybinds() {
+    keybind = loadKeybindArray('keybinds', true);
 }

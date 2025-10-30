@@ -3,7 +3,7 @@
 
 // localStrageに保存する関数
 function saveKeybinds(){
-    // 現在の入力状態を読み取って keybind / padKeybind / tpBind を個別に更新
+    // 現在の入力状態を読み取って keybind / gameKeybind / tpBind を個別に更新
     // keybind (main keys)
     for (let i = 0; i < keybind.length; i++){
         const inpKey = document.getElementById(`key${i}`);
@@ -22,19 +22,19 @@ function saveKeybinds(){
         keybind[i] = kb;
     }
 
-    // padKeybind (gamepad)
-    for (let i = 0; i < padKeybind.length; i++){
+    // gameKeybind (gamepad)
+    for (let i = 0; i < gameKeybind.length; i++){
         const prefix = 'gp_';
         const inpKey = document.getElementById(`${prefix}key${i}`);
         const sl = document.getElementById(`${prefix}event${i}`);
         const inpTopic = document.getElementById(`${prefix}topic${i}`);
         const inpMsg = document.getElementById(`${prefix}message${i}`);
-        let pb = padKeybind[i] || { key: GAME_BUTTONS[i] || '', event: 'down', topic: '', message: '' };
+        let pb = gameKeybind[i] || { key: GAME_BUTTONS[i] || '', event: 'down', topic: '', message: '' };
         if (inpKey){ pb.key = inpKey.value; }
         if (sl){ pb.event = sl.value; }
         if (inpTopic){ pb.topic = inpTopic.value; }
         if (inpMsg){ pb.message = inpMsg.value; }
-        padKeybind[i] = pb;
+        gameKeybind[i] = pb;
     }
 
     // tpBind (touchpad)
@@ -64,7 +64,7 @@ function saveKeybinds(){
     }
 
     const arr = keybind.map(toPlain);
-    const padarr = padKeybind.map(toPlain);
+    const gparr = gameKeybind.map(toPlain);
     const tparr = (typeof tpBind !== 'undefined') ? tpBind.map(toPlain) : [];
 
     // ローカルストレージの数字キーは古い保存形式なので掃除
@@ -77,83 +77,10 @@ function saveKeybinds(){
     toRemove.forEach(k => localStorage.removeItem(k));
 
     localStorage.setItem('keybinds', JSON.stringify(arr));
-    localStorage.setItem('gp_keybinds', JSON.stringify(padarr));
+    localStorage.setItem('gp_keybinds', JSON.stringify(gparr));
     localStorage.setItem('tp_keybinds', JSON.stringify(tparr));
 
     try{ showToast('Saved Successfully!'); }catch(e){ }
-}
-
-// localStrageから読み込む関数
-function loadKeybinds(){
-    // localstorageからkeybindsというキーで保存されているデータを取得
-    const data = localStorage.getItem('keybinds');
-    if (data) {
-        try {
-            // JSON文字列をkeybindの配列に変換
-            const parsed = JSON.parse(data);
-            if (Array.isArray(parsed)){
-                keybind = parsed.map(obj => {
-                    const kb = new Keybind();
-                    kb.add_key(obj.key);
-                    kb.add_event(obj.event);
-                    kb.add_topic(obj.topic);
-                    kb.add_message(obj.message);
-                    return kb;
-                });
-                // もし配列が空だったら空行を追加
-                if (keybind.length === 0) keybind.push(new Keybind());
-                return;
-            }
-        } catch(e){
-            // もしtryのプログラムでエラーが出たらコンソールに表示
-            console.error('failed to parse keybinds', e);
-        }
-    }
-
-    // localStrageにkeybindsというキーで保存されているデータがなかった場合の処理
-    keybind = [];
-    const numericKeys = [];
-    // localStrageの全部のキーを探す
-    // 数字だけのキーを抽出してnumericKeysに追加
-    // もしもlocalStrageのキーがnullや'BrokerIP'だったり，数字でなかったら無視
-    for (let i = 0; i < localStorage.length; i++){
-        const k = localStorage.key(i);
-        if (!k) continue;
-        if (k === 'BrokerIP' || k === 'BrokerPORT' || k === 'keybinds') continue;
-        if (!/^[0-9]+$/.test(k)) continue;
-        numericKeys.push(k);
-    }
-    // numbericKeysを昇順でソート
-    // この書き方はJavaとかでも使われる． バブルソートみたいなことしてる
-    // 詳しくは調べてください
-    numericKeys.sort((a,b) => Number(a) - Number(b));
-    // numericKeysの長さ回繰り返す
-    for (const k of numericKeys){
-        try{
-            // localStrageからキーkのデータを取得してJSONをkeybindのインスタンスに変換
-            const jsObj = JSON.parse(localStorage.getItem(k));
-            const kb = new Keybind();
-            kb.add_key(jsObj.key);
-            kb.add_event(jsObj.event);
-            kb.add_topic(jsObj.topic);
-            kb.add_message(jsObj.message);
-            keybind.push(kb);
-        } catch(e){
-            // ignore parse errors
-        }
-    }
-    // もしも配列が空だったら空行を追加
-    if (keybind.length === 0) keybind.push(new Keybind());
-}
-
-// 全localStorageをオブジェクトで取得
-function getAllLocalStorage(){
-    const obj = {};
-    for (let i = 0; i < localStorage.length; i++){
-        const key = localStorage.key(i);
-        obj[key] = localStorage.getItem(key);
-    }
-    return obj;
 }
 
 // localStorage 全体を JSON ファイルとしてダウンロード
@@ -241,7 +168,7 @@ function importJSON(inputEl){
                 try{
                     loadAllKeybinds();
                     renderTable();
-                    renderPadTable();
+                    renderGameTable();
                     renderTouchTable();
                 }catch(e){ console.warn('post-import render error', e); }
                 // BrokerIP / BrokerPORT があればフォームに反映

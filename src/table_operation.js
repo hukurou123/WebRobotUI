@@ -1,6 +1,7 @@
 /*
     table_operation.js
     表の行追加、削除、スクロール処理
+    localStrageのセーブ・ロード
 */
 
 /*
@@ -13,9 +14,25 @@ let tbl = document.getElementById("tbl");
 let gp_tbl = document.getElementById("gp_tbl");
 let tp_tbl = document.getElementById("tp_tbl");
 var keybind = [];
-var padKeybind = [];
+var gameKeybind = [];
 var cellId = ['', 'gp_', 'tp_'];
-const GAME_BUTTONS = ['A','B','X','Y','LB','RB','LT','RT','Back','Start','L3','R3','Up','Down','Left','Right', 'Left X', 'Left Y', 'Right X', 'Right Y'];
+
+function syncInputsToKeybind(){
+    const rows = document.querySelectorAll('#tbl tr');
+    keybind = Array.from(rows).slice(1).map((row, i) => {
+        const kb = new Keybind();
+        const keyEl = document.getElementById(`key${i}`);
+        const eventEl = document.getElementById(`event${i}`);
+        const topicEl = document.getElementById(`topic${i}`);
+        const msgEl = document.getElementById(`message${i}`);
+        kb.add_key(keyEl?.value || '');
+        kb.add_event(eventEl?.value || '');
+        kb.add_topic(topicEl?.value || '');
+        kb.add_message(msgEl?.value || '');
+        return kb;
+    });
+}
+
 
 // 汎用的テーブルレンダラ
 function renderGenericTable({tableId, data, options = {}, onSaveRow}){
@@ -119,6 +136,7 @@ function renderGenericTable({tableId, data, options = {}, onSaveRow}){
                     // splice : つなぎ合わせる 
                     // javascriptのArreyインスタンスメソッド
                     data.splice(i,1); 
+                    syncInputsToKeybind();
                     // 再描画
                     renderGenericTable({tableId, data, options, onSaveRow}); 
                 } 
@@ -143,116 +161,72 @@ function scrollToBottom(scrollTarget){
     obj.scrollTop = obj.scrollHeight;
 }
 
-
-
-
-// --- pad table handling (fixed rows, no add/remove) -------------------------
-function loadPadKeybinds(){
-    const data = localStorage.getItem('gp_keybinds');
-    padKeybind = [];
+// 汎用ロード
+function loadKeybindArray(keyName, addDefaults = true) {
+    // keyNameの要素をhtmlから取得
+    const data = localStorage.getItem(keyName);
+    let arr = [];
+    // dataがあれば
     if (data) {
         try {
+            // dataをJSON形式の文字列に変換
             const parsed = JSON.parse(data);
+            // 文字列を配列に変換できるなら
             if (Array.isArray(parsed)) {
-                // restore as Keybind instances if possible
-                padKeybind = parsed.map(obj => {
-                    try{
+                // map型に変換．中身はKeybindのインスタンス
+                arr = parsed.map(obj => {
+                    try {
+                        // Keybindのインスタンスを作成，初期化
                         const kb = new Keybind();
                         kb.add_key(obj.key);
                         kb.add_event(obj.event);
                         kb.add_topic(obj.topic);
                         kb.add_message(obj.message);
                         return kb;
-                    }catch(e){
+                    } catch (e) {
+                        // エラーキャッチ
+                        console.warn(`Invalid Keybind entry in ${keyName}`, e);
                         return { key: obj.key, event: obj.event, topic: obj.topic, message: obj.message };
                     }
                 });
             }
-        } catch(e){ console.error('failed to parse gp_keybinds', e); }
-    }
-    // ensure we have entries for all GAME_BUTTONS
-    for (let i = 0; i < GAME_BUTTONS.length; i++){
-        if (!padKeybind[i]) padKeybind[i] = { key: GAME_BUTTONS[i], event: 'down', topic: '', message: '' };
-        else padKeybind[i].key = GAME_BUTTONS[i];
-    }
-}
-
-// load all three kinds of bindings from localStorage (key, pad, touch)
-function loadAllKeybinds(){
-    // main keybinds (existing logic)
-    loadKeybinds();
-
-    // pad keybinds
-    loadPadKeybinds();
-    // ensure entries exist for all GAME_BUTTONS
-    for (let i = 0; i < GAME_BUTTONS.length; i++){
-        if (!padKeybind[i]){
-            const kb = new Keybind();
-            kb.add_key(GAME_BUTTONS[i]);
-            kb.add_event('down');
-            kb.add_topic('');
-            kb.add_message('');
-            padKeybind[i] = kb;
-        } else {
-            // if plain object, ensure key matches button label
-            if (typeof padKeybind[i].get_key !== 'function') padKeybind[i].key = GAME_BUTTONS[i];
+        } catch (e) {
+            // エラーキャッチ
+            console.error(`Failed to parse ${keyName}`, e);
         }
     }
-
-    // touchpad bindings: try to restore tp_keybinds if present
-    const tpData = localStorage.getItem('tp_keybinds');
-    if (tpData){
-        try{
-            const parsed = JSON.parse(tpData);
-            if (Array.isArray(parsed)){
-                // ensure tpBind exists (touchpad.js defines tpBind but it's global)
-                if (typeof tpBind === 'undefined') window.tpBind = [];
-                tpBind = parsed.map(obj => {
-                    try{
-                        const kb = new Keybind();
-                        kb.add_key(obj.key);
-                        kb.add_event(obj.event);
-                        kb.add_topic(obj.topic);
-                        kb.add_message(obj.message);
-                        return kb;
-                    }catch(e){
-                        return { key: obj.key, event: obj.event, topic: obj.topic, message: obj.message };
-                    }
-                });
-            }
-        }catch(e){ console.error('failed to parse tp_keybinds', e); }
+    // 何も保存されていないデフォルト状態で1行追加する必要がある場合追加
+    // KeybindとTouchPadの場合(GamePadはボタン数だけ標準で作成されるので必要ない)
+    if (addDefaults && arr.length === 0) {
+        arr.push(new Keybind());
     }
-    // ensure at least one touch row exists so UI has something
-    if (typeof tpBind === 'undefined' || tpBind.length === 0){
-        if (typeof tpBind === 'undefined') tpBind = [];
-        tpBind.push(new Keybind());
-    }
+    return arr;
 }
 
-// ページ初期化時に padKeybind を GAME_BUTTONS の数だけ用意する（未保存ならデフォルト）
-function initializePadKeybinds(){
-    // 既に loadPadKeybinds() を使っている場合はそれを呼ぶ
-    loadPadKeybinds();
-    // 追加の安全措置: もし localStorage に何もなくても GAME_BUTTONS に合わせる
-    for (let i = 0; i < GAME_BUTTONS.length; i++){
-        if (!padKeybind[i]) padKeybind[i] = { key: GAME_BUTTONS[i], event: 'down', topic: '', message: '' };
-        else padKeybind[i].key = GAME_BUTTONS[i];
+// 全localStorageをオブジェクトで取得
+function getAllLocalStorage(){
+    const obj = {};
+    for (let i = 0; i < localStorage.length; i++){
+        const key = localStorage.key(i);
+        obj[key] = localStorage.getItem(key);
     }
+    return obj;
 }
 
-function savePadKeybinds(){
-    localStorage.setItem('gp_keybinds', JSON.stringify(padKeybind));
+// すべてのキーバインドをロードする(key, game, touch)
+function loadAllKeybinds(){
+    loadKeybinds();
+    loadGameKeybinds();
+    loadTouchKeybinds();
 }
 
-// 読み込み時に表を初期化
+// ページ読み込み時に表を初期化
 window.onload = () => {
     // load all bindings then render
     loadAllKeybinds();
     renderTable();
-    renderPadTable();
+    renderGameTable();
     renderTouchTable();
-    // loadPadKeybinds();
-    // renderPadTable();
 };
 
 // トースト通知を表示する関数

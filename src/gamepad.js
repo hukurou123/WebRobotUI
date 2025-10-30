@@ -149,6 +149,7 @@ class GamePad {
 
 // インスタンス作成
 const gamepad = new GamePad(0);
+const GAME_BUTTONS = ['A','B','X','Y','LB','RB','LT','RT','Back','Start','L3','R3','Up','Down','Left','Right', 'Left X', 'Left Y', 'Right X', 'Right Y'];
 
 // htmlに安全にテキストをセットする関数
 // idがなかった場合にエラーが出ないようにする
@@ -208,10 +209,10 @@ function btnUpHandler(/* event */) {
 }
 
 // 表を描画する関数 (ゲームパッド用)
-function renderPadTable(){
+function renderGameTable(){
     renderGenericTable({
         tableId: 'gp_tbl',
-        data: padKeybind,
+        data: gameKeybind,
         options: {
             includeIndex: false,
             includeDelete: false,
@@ -220,4 +221,23 @@ function renderPadTable(){
             idPrefix: 'gp_'
         },
     });
+}
+
+// 汎用ロード関数を利用してlocalStrageから読み出す
+function loadGameKeybinds() {
+    gameKeybind = loadKeybindArray('gp_keybinds', false);
+
+    // GAME_BUTTONSの長さ分だけ繰り返し
+    for (let i = 0; i < GAME_BUTTONS.length; i++) {
+        if (!gameKeybind[i]) {
+            gameKeybind[i] = { key: GAME_BUTTONS[i], event: 'down', topic: '', message: '' };
+        } else {
+            gameKeybind[i].key = GAME_BUTTONS[i];
+        }
+    }
+}
+
+// localStrageにgp_keybindsを保存する
+function saveGameKeybinds(){
+    localStorage.setItem('gp_keybinds', JSON.stringify(gameKeybind));
 }

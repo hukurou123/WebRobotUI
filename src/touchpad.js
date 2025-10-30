@@ -8,6 +8,8 @@ function tpLengthGet(){ return parseInt(localStorage.getItem('tp:length') || '0'
 function tpLengthSet(v){ localStorage.setItem('tp:length', String(v)); }
 
 function tpAdd(){
+    // 再描画する前に今の入力内容をkeybind配列に保存
+    syncInputsToKeybind();
     tpBind.push(new Keybind());
     renderTouchTable();
 }
@@ -47,6 +49,10 @@ function renderTouchTable(){
 //         if (rowIdx === len) tpAdd();
 //     }
 // }
+
+function loadTouchKeybinds(){
+    tpBind = loadKeybindArray('tp_keybinds', true);
+}
 
 function tpToggleViews(){
     const settings = document.getElementById('tp_settings');
