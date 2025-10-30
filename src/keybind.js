@@ -68,7 +68,7 @@ var keybind = [];
 // 表を追加する関数
 function add(){
     // 再描画する前に今の入力内容をkeybind配列に保存
-    syncInputsToKeybind();
+    syncInputsToKeybind('tbl', '', keybind);
     keybind.push(new Keybind());
     renderTable();
 }

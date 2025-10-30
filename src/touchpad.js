@@ -9,11 +9,12 @@ function tpLengthSet(v){ localStorage.setItem('tp:length', String(v)); }
 
 function tpAdd(){
     // 再描画する前に今の入力内容をkeybind配列に保存
-    syncInputsToKeybind();
+    syncInputsToKeybind('tp_tbl', 'tp_', tpBind);
     tpBind.push(new Keybind());
     renderTouchTable();
 }
 
+// touchpadの表を描画する
 function renderTouchTable(){
     renderGenericTable({
         tableId: 'tp_tbl',
@@ -28,28 +29,7 @@ function renderTouchTable(){
     });
 }
 
-// function tpLoad(){
-//     // ensure at least one row
-//     tpAdd();
-//     const len = tpLengthGet();
-//     for (let i=0; i<len; i++){
-//         const json = localStorage.getItem(tpStorageKey(i));
-//         if (!json) continue;
-//         const js = JSON.parse(json);
-//         // ensure row exists
-//         if (tpTable().rows.length-1 < i+1) tpAdd();
-//         const rowIdx = i+1;
-//         document.getElementById(`tp_button${rowIdx}`).value = js.key;
-//         const evSel = document.getElementById(`tp_event${rowIdx}`);
-//         for (let o of evSel.options){ if (o.text === js.event){ o.selected = true; break; } }
-//         document.getElementById(`tp_topic${rowIdx}`).value = js.topic;
-//         document.getElementById(`tp_message${rowIdx}`).value = js.message;
-//         tpBind[i] = js;
-//         // add another empty row for convenience
-//         if (rowIdx === len) tpAdd();
-//     }
-// }
-
+// 汎用ロード関数を利用してlocalStrageからロードする
 function loadTouchKeybinds(){
     tpBind = loadKeybindArray('tp_keybinds', true);
 }

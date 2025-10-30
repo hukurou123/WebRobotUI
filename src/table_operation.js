@@ -17,20 +17,31 @@ var keybind = [];
 var gameKeybind = [];
 var cellId = ['', 'gp_', 'tp_'];
 
-function syncInputsToKeybind(){
-    const rows = document.querySelectorAll('#tbl tr');
-    keybind = Array.from(rows).slice(1).map((row, i) => {
+// 保存前のキーを配列に同期させる関数
+function syncInputsToKeybind(tableId, cellId, targetArray){
+    // tableIdの要素を取得
+    const tblEl = document.getElementById(tableId);
+    const rows = tblEl.querySelectorAll('tr');
+    // 新しい配列を作って今表に入力してある要素をすべて配列に入れる
+    // 既存の配列にそのままやるとうまくいかないみたい
+    const newArray = Array.from(rows).slice(1).map((row, i) => {
         const kb = new Keybind();
-        const keyEl = document.getElementById(`key${i}`);
-        const eventEl = document.getElementById(`event${i}`);
-        const topicEl = document.getElementById(`topic${i}`);
-        const msgEl = document.getElementById(`message${i}`);
+        const keyEl = row.querySelector(`#${cellId}key${i}`);
+        const eventEl = row.querySelector(`#${cellId}event${i}`);
+        const topicEl = row.querySelector(`#${cellId}topic${i}`);
+        const msgEl = row.querySelector(`#${cellId}message${i}`);
         kb.add_key(keyEl?.value || '');
         kb.add_event(eventEl?.value || '');
         kb.add_topic(topicEl?.value || '');
         kb.add_message(msgEl?.value || '');
         return kb;
     });
+
+    // 既存の配列をいったん削除
+    targetArray.length = 0;
+    // 既存の配列に新しく作った配列を入れなおす
+    // ...newArrayはスプレッド構文
+    targetArray.push(...newArray);
 }
 
 
@@ -131,14 +142,14 @@ function renderGenericTable({tableId, data, options = {}, onSaveRow}){
             const btnDel = document.createElement('button'); 
             btnDel.textContent = '−'; 
             // ラムダ式 delボタンがクリックされたときの処理
-            btnDel.onclick = () => { 
+            btnDel.onclick = () => {
                 if (typeof data.splice === 'function') {
-                    // splice : つなぎ合わせる 
-                    // javascriptのArreyインスタンスメソッド
-                    data.splice(i,1); 
-                    syncInputsToKeybind();
-                    // 再描画
-                    renderGenericTable({tableId, data, options, onSaveRow}); 
+                    data.splice(i, 1);
+                    // 再描画せずにその行だけ削除
+                    const row = btnDel.closest('tr');
+                    if (row) row.remove();
+                    // もし入力内容とdataの同期が必要なら、ここで呼ぶ
+                    syncInputsToKeybind(tableId, idPrefix, data);
                 } 
             };
             tdDel.appendChild(btnDel);
