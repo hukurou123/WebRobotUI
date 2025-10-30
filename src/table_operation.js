@@ -17,53 +17,21 @@ var padKeybind = [];
 var cellId = ['', 'gp_', 'tp_'];
 const GAME_BUTTONS = ['A','B','X','Y','LB','RB','LT','RT','Back','Start','L3','R3','Up','Down','Left','Right', 'Left X', 'Left Y', 'Right X', 'Right Y'];
 
-// 行を追加する関数
-function add(){
-    keybind.push(new Keybind());
-    renderTable();
-}
-
-// 行を削除する関数 (キー用)
-function remove(index){
-    // リストの範囲外だったら何もしない
-    if (index < 0 || index >= keybind.length) return;
-
-    keybind.splice(index, 1);
-    // リストが空になったら空行を追加
-    if (keybind.length === 0) keybind.push(new Keybind());
-
-    renderTable();
-}
-
-// 表を描画する関数 (キー用)
-function renderTable(){
-    // 抽象化された共通レンダラを利用して描画
-    renderGenericTable({
-        tableId: 'tbl',
-        data: keybind,
-        options: {
-            includeIndex: true,
-            includeDelete: true,
-            keyEditable: true,
-            keySelect: false,
-            idPrefix: ''
-        }
-    });
-}
-
-
 // 汎用的テーブルレンダラ
 function renderGenericTable({tableId, data, options = {}, onSaveRow}){
     const { includeIndex = false, includeDelete = false, keyEditable = true, keySelect = false, idPrefix = '' } = options;
+    // tableIdの要素をとってくる．なければ終了
     const tblEl = document.getElementById(tableId);
     if (!tblEl) return;
 
     // ヘッダは既存のものを利用する前提。行をすべて削除してから再描画
     while (tblEl.rows.length > 1) tblEl.deleteRow(1);
 
+    // dataの分だけ繰り返し仮変数bindは設定されているキー情報
     data.forEach((bind, i) => {
         const tr = document.createElement('tr');
 
+    // 行番号
         if (includeIndex){
             const tdIndex = document.createElement('td');
             tdIndex.textContent = i + 1;
@@ -71,16 +39,22 @@ function renderGenericTable({tableId, data, options = {}, onSaveRow}){
             tr.appendChild(tdIndex);
         }
 
-        // key cell
+    // keyの列
         const tdKey = document.createElement('td');
+        // keyの列が編集可能な場合
         if (keyEditable){
             const inpKey = document.createElement('input');
             inpKey.id = `${idPrefix}key${i}`;
             inpKey.classList.add('cell');
+            // 三項演算子と論理和演算子を使っていろいろ
+            // bind.get_keyが関数型ならvalueにbind.get_key()(それがなければ'')を入れる
+            // bind.get_keyが関数型でないならvalueにbind.key(それがなければ'')を入れる
             inpKey.value = (typeof bind.get_key === 'function') ? bind.get_key() || '' : (bind.key || '');
             tdKey.appendChild(inpKey);
+        // keyの列が編集不可能な場合(選択)
         } else if(!keyEditable && keySelect){
             const selKey = document.createElement('select');
+            // 本当はここも引数にして拡張性を高めるべきなんだけど面倒くさいなー
             ['Up','Down', 'Left', 'Right'].forEach(opt => {
                 const option = document.createElement('option');
                 option.text = opt;
@@ -91,39 +65,64 @@ function renderGenericTable({tableId, data, options = {}, onSaveRow}){
             selKey.id = `${idPrefix}key${i}`;
             selKey.classList.add('cell');
             tdKey.appendChild(selKey);
+        // keyの列が編集不可能な場合(ゲームパッド)
         } else {
+            // 論理和演算子 bind.keyがあるならそれを入れて，なければ''を入れる
             tdKey.textContent = bind.key || '';
             tdKey.id = `${idPrefix}key${i}`;
             tdKey.classList.add('no-edit-cell');
         }
         tr.appendChild(tdKey);
 
-        // event select
+    // eventの列
         const tdEvent = document.createElement('td');
         const sl = document.createElement('select');
+        // down,upの配列を仮変数optで繰り返す
         ['down','up'].forEach(opt => {
-            const option = document.createElement('option'); option.text = opt; if ((bind.event || '') === opt) option.selected = true; sl.appendChild(option);
+            const option = document.createElement('option'); 
+            option.text = opt; 
+            // すでに保存されている選択肢を表示
+            // bind.eventあるいは''がoptと完全一致したなら option.selectedをtrueに
+            if ((bind.event || '') === opt) option.selected = true; 
+            sl.appendChild(option);
         });
         sl.id = `${idPrefix}event${i}`;
         sl.classList.add('cell');
         tdEvent.appendChild(sl);
         tr.appendChild(tdEvent);
 
-        // topic
+    // topicの列
         const tdTopic = document.createElement('td');
-        const inpTopic = document.createElement('input'); inpTopic.id = `${idPrefix}topic${i}`; inpTopic.classList.add('cell'); inpTopic.value = bind.topic || '';
+        const inpTopic = document.createElement('input'); 
+        inpTopic.id = `${idPrefix}topic${i}`; 
+        inpTopic.classList.add('cell'); 
+        inpTopic.value = bind.topic || '';
         tdTopic.appendChild(inpTopic); tr.appendChild(tdTopic);
 
-        // message
+    // messageの列
         const tdMsg = document.createElement('td');
-        const inpMsg = document.createElement('input'); inpMsg.id = `${idPrefix}message${i}`; inpMsg.classList.add('cell'); inpMsg.value = bind.message || '';
+        const inpMsg = document.createElement('input'); 
+        inpMsg.id = `${idPrefix}message${i}`; 
+        inpMsg.classList.add('cell'); 
+        inpMsg.value = bind.message || '';
         tdMsg.appendChild(inpMsg); tr.appendChild(tdMsg);
 
-        // delete (optional)
+    // deleteの列(optional)
         if (includeDelete){
             const tdDel = document.createElement('td');
             tdDel.classList.add('delete-btn');
-            const btnDel = document.createElement('button'); btnDel.textContent = '−'; btnDel.onclick = () => { if (typeof data.splice === 'function') { data.splice(i,1); /* re-render */ renderGenericTable({tableId, data, options, onSaveRow}); } };
+            const btnDel = document.createElement('button'); 
+            btnDel.textContent = '−'; 
+            // ラムダ式 delボタンがクリックされたときの処理
+            btnDel.onclick = () => { 
+                if (typeof data.splice === 'function') {
+                    // splice : つなぎ合わせる 
+                    // javascriptのArreyインスタンスメソッド
+                    data.splice(i,1); 
+                    // 再描画
+                    renderGenericTable({tableId, data, options, onSaveRow}); 
+                } 
+            };
             tdDel.appendChild(btnDel);
             tr.appendChild(tdDel);
         }
@@ -136,155 +135,11 @@ function renderGenericTable({tableId, data, options = {}, onSaveRow}){
     else if (tableId === 'tp_tbl') scrollToBottom(tp_tbl);
 }
 
-
-// localStrageに保存する関数
-function saveKeybinds(){
-    // 現在の入力状態を読み取って keybind / padKeybind / tpBind を個別に更新
-    // keybind (main keys)
-    for (let i = 0; i < keybind.length; i++){
-        const inpKey = document.getElementById(`key${i}`);
-        const sl = document.getElementById(`event${i}`);
-        const inpTopic = document.getElementById(`topic${i}`);
-        const inpMsg = document.getElementById(`message${i}`);
-        const kb = keybind[i] || new Keybind();
-        if (inpKey && typeof kb.add_key === 'function') kb.add_key(inpKey.value);
-        else if (inpKey) kb.key = inpKey.value;
-        if (sl && typeof kb.add_event === 'function') kb.add_event(sl.value);
-        else if (sl) kb.event = sl.value;
-        if (inpTopic && typeof kb.add_topic === 'function') kb.add_topic(inpTopic.value);
-        else if (inpTopic) kb.topic = inpTopic.value;
-        if (inpMsg && typeof kb.add_message === 'function') kb.add_message(inpMsg.value);
-        else if (inpMsg) kb.message = inpMsg.value;
-        keybind[i] = kb;
-    }
-
-    // padKeybind (gamepad)
-    for (let i = 0; i < padKeybind.length; i++){
-        const prefix = 'gp_';
-        const inpKey = document.getElementById(`${prefix}key${i}`);
-        const sl = document.getElementById(`${prefix}event${i}`);
-        const inpTopic = document.getElementById(`${prefix}topic${i}`);
-        const inpMsg = document.getElementById(`${prefix}message${i}`);
-        let pb = padKeybind[i] || { key: GAME_BUTTONS[i] || '', event: 'down', topic: '', message: '' };
-        if (inpKey){ pb.key = inpKey.value; }
-        if (sl){ pb.event = sl.value; }
-        if (inpTopic){ pb.topic = inpTopic.value; }
-        if (inpMsg){ pb.message = inpMsg.value; }
-        padKeybind[i] = pb;
-    }
-
-    // tpBind (touchpad)
-    if (typeof tpBind !== 'undefined'){
-        for (let i = 0; i < tpBind.length; i++){
-            const prefix = 'tp_';
-            const inpKey = document.getElementById(`${prefix}key${i}`);
-            const sl = document.getElementById(`${prefix}event${i}`);
-            const inpTopic = document.getElementById(`${prefix}topic${i}`);
-            const inpMsg = document.getElementById(`${prefix}message${i}`);
-            let tb = tpBind[i] || { key: '', event: 'down', topic: '', message: '' };
-            if (inpKey){ tb.key = inpKey.value; }
-            if (sl){ tb.event = sl.value; }
-            if (inpTopic){ tb.topic = inpTopic.value; }
-            if (inpMsg){ tb.message = inpMsg.value; }
-            tpBind[i] = tb;
-        }
-    }
-
-    // 配列をオブジェクト配列に変換して保存（Keybind インスタンスとプレーンオブジェクトの両方に対応）
-    function toPlain(item){
-        if (!item) return { key: '', event: '', topic: '', message: '' };
-        if (typeof item.get_key === 'function'){
-            return { key: item.get_key(), event: item.get_event(), topic: item.get_topic(), message: item.get_message() };
-        }
-        return { key: item.key || '', event: item.event || '', topic: item.topic || '', message: item.message || '' };
-    }
-
-    const arr = keybind.map(toPlain);
-    const padarr = padKeybind.map(toPlain);
-    const tparr = (typeof tpBind !== 'undefined') ? tpBind.map(toPlain) : [];
-
-    // ローカルストレージの数字キーは古い保存形式なので掃除
-    const toRemove = [];
-    for (let i = 0; i < localStorage.length; i++){
-        const k = localStorage.key(i);
-        if (!k) continue;
-        if (/^[0-9]+$/.test(k)) toRemove.push(k);
-    }
-    toRemove.forEach(k => localStorage.removeItem(k));
-
-    localStorage.setItem('keybinds', JSON.stringify(arr));
-    localStorage.setItem('gp_keybinds', JSON.stringify(padarr));
-    localStorage.setItem('tp_keybinds', JSON.stringify(tparr));
-
-    try{ showToast('Saved Successfully!'); }catch(e){ }
-}
-
-// localStrageから読み込む関数
-function loadKeybinds(){
-    // localstorageからkeybindsというキーで保存されているデータを取得
-    const data = localStorage.getItem('keybinds');
-    if (data) {
-        try {
-            // JSON文字列をkeybindの配列に変換
-            const parsed = JSON.parse(data);
-            if (Array.isArray(parsed)){
-                keybind = parsed.map(obj => {
-                    const kb = new Keybind();
-                    kb.add_key(obj.key);
-                    kb.add_event(obj.event);
-                    kb.add_topic(obj.topic);
-                    kb.add_message(obj.message);
-                    return kb;
-                });
-                // もし配列が空だったら空行を追加
-                if (keybind.length === 0) keybind.push(new Keybind());
-                return;
-            }
-        } catch(e){
-            // もしtryのプログラムでエラーが出たらコンソールに表示
-            console.error('failed to parse keybinds', e);
-        }
-    }
-
-    // localStrageにkeybindsというキーで保存されているデータがなかった場合の処理
-    keybind = [];
-    const numericKeys = [];
-    // localStrageの全部のキーを探す
-    // 数字だけのキーを抽出してnumericKeysに追加
-    // もしもlocalStrageのキーがnullや'BrokerIP'だったり，数字でなかったら無視
-    for (let i = 0; i < localStorage.length; i++){
-        const k = localStorage.key(i);
-        if (!k) continue;
-        if (k === 'BrokerIP' || k === 'BrokerPORT' || k === 'keybinds') continue;
-        if (!/^[0-9]+$/.test(k)) continue;
-        numericKeys.push(k);
-    }
-    // numbericKeysを昇順でソート
-    // この書き方はJavaとかでも使われる． バブルソートみたいなことしてる
-    // 詳しくは調べてください
-    numericKeys.sort((a,b) => Number(a) - Number(b));
-    // numericKeysの長さ回繰り返す
-    for (const k of numericKeys){
-        try{
-            // localStrageからキーkのデータを取得してJSONをkeybindのインスタンスに変換
-            const jsObj = JSON.parse(localStorage.getItem(k));
-            const kb = new Keybind();
-            kb.add_key(jsObj.key);
-            kb.add_event(jsObj.event);
-            kb.add_topic(jsObj.topic);
-            kb.add_message(jsObj.message);
-            keybind.push(kb);
-        } catch(e){
-            // ignore parse errors
-        }
-    }
-    // もしも配列が空だったら空行を追加
-    if (keybind.length === 0) keybind.push(new Keybind());
-}
-
 // 最下行にスクロールする関数
 function scrollToBottom(scrollTarget){
+    // scrollTargetの親の要素を取得
     const obj = scrollTarget.parentElement;
+    // 親オブジェクトの高さだけ下に？？ここはよくわかんない
     obj.scrollTop = obj.scrollHeight;
 }
 

@@ -60,3 +60,29 @@ class Keybind {
         return jsObj;
     }
 }
+
+// --------- instance + handlers ------------------------------------------------
+
+var keybind = [];
+
+// 表を追加する関数
+function add(){
+    keybind.push(new Keybind());
+    renderTable();
+}
+
+// 表を描画する関数 (キー用)
+function renderTable(){
+    // 抽象化された共通レンダラを利用して描画
+    renderGenericTable({
+        tableId: 'tbl',
+        data: keybind,
+        options: {
+            includeIndex: true,
+            includeDelete: true,
+            keyEditable: true,
+            keySelect: false,
+            idPrefix: ''
+        }
+    });
+}

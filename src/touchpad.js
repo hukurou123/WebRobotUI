@@ -98,7 +98,7 @@ window.addEventListener('load', () => {
     // prepare settings table
     tpLoad();
     const toggle = document.getElementById('tp_toggle');
-    if (toggle){ toggle.addEventListener('click', tpToggleViews); }
+    // if (toggle){ toggle.addEventListener('click', tpToggleViews); }
     // bind dpad buttons
     ['tp_up','tp_down','tp_left','tp_right'].forEach(id => {
         const el = document.getElementById(id);
