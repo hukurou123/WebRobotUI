@@ -76,11 +76,17 @@ function setupKeyPublish(array, tableId, eventType, keyName) {
         const keyToCheck = keyName || (eventType.key ? eventType.key : null);
         //押されたキーが配列に登録されているなら
         if (kb.get_key() === keyToCheck && kb.get_event() === eventType) {
-            console.log(keyToCheck + " です");
-            if (client && typeof client.publish === 'function') {
-                client.publish(kb.get_topic(), kb.get_message());
-            } else {
-                console.warn('publish skipped: client not ready');
+            const topic = kb.get_topic();
+            const message = kb.get_message();
+
+            // topicとmessageが空でなければ送信
+            if (topic && message){
+                console.log(keyToCheck + " です");
+                if (client && typeof client.publish === 'function') {
+                    client.publish(kb.get_topic(), kb.get_message());
+                } else {
+                    console.warn('publish skipped: client not ready');
+                }
             }
         }
     }

@@ -33,30 +33,6 @@ function loadTouchKeybinds(){
     tpBind = loadKeybindArray('tp_keybinds', true);
 }
 
-// タッチパッドが押されたときに通信する処理
-// function tpPublishFor(buttonName, phase){
-//     try{
-//         for (let i=0; i<tpLengthGet(); i++){
-//             const json = localStorage.getItem(tpStorageKey(i));
-//             if (!json) continue;
-//             const js = JSON.parse(json);
-//             if (js.key === buttonName && js.event === phase){
-//                 if (typeof client !== 'undefined' && client){
-//                     client.publish(js.topic, js.message);
-//                 }
-//             }
-//         }
-//     }catch(e){ console.warn('tp publish error', e); }
-// }
-
-// document.addEventListener('keydown', event => {
-//     setupKeyPublish(tpBind, 'tp_tbl', 'down', event);
-// });
-
-// document.addEventListener('keyup', event => {
-//     setupKeyPublish(tpBind, 'tp_tbl', 'up', event);
-// });
-
 // タッチパッドが押されたときの処理を設定
 function tpBindButtonPress(el){
     const name = el.dataset.button;

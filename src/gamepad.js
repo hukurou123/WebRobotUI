@@ -94,6 +94,7 @@ class GamePad {
             }
         }
 
+        const keyMap = ['A','B','X','Y','LB','RB','LT','RT','Back','Start','L3','R3','Up','Down','Left','Right'];
         // 前フレームと比較してボタンが押されているか・離されているかどうかを監視
         if (gamepad) {
             // buttons
@@ -103,12 +104,12 @@ class GamePad {
                 if (pressed) {
                     if (!this.prev_pressed[index]) {
                         // 登録されたリスナーにボタンが押されたと通知する関数
-                        this.notify_event('pressed', { index });
+                        this.notify_event('pressed', {key: keyMap[index] || `Btn${index}`});
                         this.prev_pressed[index] = true;
                     }
                 } else {
                     if (this.prev_pressed[index]) {
-                        this.notify_event('released', { index });
+                        this.notify_event('released', {key: keyMap[index] || `Btn${index}`});
                         this.prev_pressed[index] = false;
                     }
                 }
@@ -179,33 +180,18 @@ function stickHandler(event) {
 
 // ボタンが押されたときに実行される関数
 function btnDownHandler(event) {
-    // console.log('Button pressed', event.index);
-    // event.indexによって入れるテキストを変える
-    switch (event.index) {
-        case 0: safeSetText('buttonstatus', 'A pressed'); break;
-        case 1: safeSetText('buttonstatus', 'B pressed'); break;
-        case 2: safeSetText('buttonstatus', 'Y pressed'); break;
-        case 3: safeSetText('buttonstatus', 'X pressed'); break;
-        case 4: safeSetText('buttonstatus', 'LB pressed'); break;
-        case 5: safeSetText('buttonstatus', 'RB pressed'); break;
-        case 6: safeSetText('buttonstatus', 'LT pressed'); break;
-        case 7: safeSetText('buttonstatus', 'RT pressed'); break;
-        case 8: safeSetText('buttonstatus', 'Back pressed'); break;
-        case 9: safeSetText('buttonstatus', 'Start pressed'); break;
-        case 10: safeSetText('buttonstatus', 'L3 pressed'); break;
-        case 11: safeSetText('buttonstatus', 'R3 pressed'); break;
-        case 12: safeSetText('buttonstatus', 'Up pressed'); break;
-        case 13: safeSetText('buttonstatus', 'Down pressed'); break;
-        case 14: safeSetText('buttonstatus', 'Left pressed'); break;
-        case 15: safeSetText('buttonstatus', 'Right pressed'); break;
-        default: safeSetText('buttonstatus', `Btn ${event.index} pressed`); break;
-    }
+    const keyName = event.key;
+    safeSetText('buttonstatus', `${event.key} pressed`);
+    setupKeyPublish(gameKeybind, 'gp_tbl', 'down', keyName);
 }
 
 // ボタンが離されたときに実行される関数
-function btnUpHandler(/* event */) {
+function btnUpHandler(event) {
+    const keyName = event.key;
+    setupKeyPublish(gameKeybind, 'gp_tbl', 'up', keyName);
     // releasedと表示する
     safeSetText('buttonstatus', 'released');
+    
 }
 
 // 表を描画する関数 (ゲームパッド用)
