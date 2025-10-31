@@ -79,8 +79,8 @@ function setupKeyPublish(array, tableId, eventType, keyName) {
             const topic = kb.get_topic();
             const message = kb.get_message();
 
-            // topicとmessageが空でなければ送信
-            if (topic && message){
+            // topicが空でなければ送信
+            if (topic){
                 console.log(keyToCheck + " です");
                 if (client && typeof client.publish === 'function') {
                     client.publish(kb.get_topic(), kb.get_message());

@@ -133,7 +133,15 @@ function renderGenericTable({tableId, data, options = {}, onSaveRow}){
         inpMsg.id = `${idPrefix}message${i}`; 
         inpMsg.classList.add('cell'); 
         inpMsg.value = bind.message || '';
-        tdMsg.appendChild(inpMsg); tr.appendChild(tdMsg);
+        const keyName = bind.key || '';  
+        if (['Left X', 'Left Y', 'Right X', 'Right Y'].includes(keyName)) {
+            inpMsg.disabled = true;
+            inpMsg.placeholder = '(stick input)';
+            // inpMsg.classList.add('disabled-cell'); // CSSで見た目変えたいなら
+            inpMsg.dataset.axisName = keyName;
+        }
+        tdMsg.appendChild(inpMsg); 
+        tr.appendChild(tdMsg);
 
     // deleteの列(optional)
         if (includeDelete){

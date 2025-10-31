@@ -240,6 +240,13 @@ td{
     box-sizing: border-box;
 }
 
+input:disabled {
+    font-size: large;
+    color: #333333;
+    opacity: 1;           /* 薄くならないようにする */
+    background-color: #E0E0E0;
+}
+
 
 
 /* ボタンのスタイル */

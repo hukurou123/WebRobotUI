@@ -122,6 +122,12 @@ class GamePad {
                 // 0.01以上動いたら変化ありとして発火する
                 if (Math.abs(prev - axis) > 0.01) {
                     this.notify_event('axis_changed', { index, value: axis });
+                    const axisNames = ['Left X', 'Left Y', 'Right X', 'Right Y'];
+                    const axisName = axisNames[index];
+                    if (axisName) {
+                        const input = document.querySelector(`[data-axis-name="${axisName}"]`);
+                        if (input) input.value = axis.toFixed(2); // 小数2桁くらいで表示
+                    }
                 }
                 this.prev_axes[index] = axis;
             });
