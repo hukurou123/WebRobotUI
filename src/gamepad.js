@@ -125,8 +125,15 @@ class GamePad {
                     const axisNames = ['Left X', 'Left Y', 'Right X', 'Right Y'];
                     const axisName = axisNames[index];
                     if (axisName) {
+                        // 表示用
                         const input = document.querySelector(`[data-axis-name="${axisName}"]`);
                         if (input) input.value = axis.toFixed(2); // 小数2桁くらいで表示
+                        
+                        // スティックの値をmqtt通信する用
+                        const topicInput = document.getElementById(`gp_topic${16 + index}`); // 例: LeftX→16番目
+                        const topic = topicInput?.value?.trim();
+                        const message = axis.toFixed(2);
+                        stickPublish(topic, message);
                     }
                 }
                 this.prev_axes[index] = axis;

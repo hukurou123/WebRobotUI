@@ -58,6 +58,7 @@ const isEmpty = (obj) => {
 
 
 // 任意の配列とテーブルIDを使ってキーイベントでMQTT通信
+// スティックの通信はgamepadのクラスに直書きしてます
 function setupKeyPublish(array, tableId, eventType, keyName) {
     const tbl = document.getElementById(tableId);
     if (!tbl) return;
@@ -77,8 +78,8 @@ function setupKeyPublish(array, tableId, eventType, keyName) {
         //押されたキーが配列に登録されているなら
         if (kb.get_key() === keyToCheck && kb.get_event() === eventType) {
             const topic = kb.get_topic();
-            const message = kb.get_message();
-
+            // const message = kb.get_message();
+            // console.log(keyToCheck + " です");
             // topicが空でなければ送信
             if (topic){
                 console.log(keyToCheck + " です");
@@ -92,4 +93,13 @@ function setupKeyPublish(array, tableId, eventType, keyName) {
     }
 }
 
+function stickPublish(topic, message) {
+    if (!topic) return;
+    if (client && typeof client.publish === 'function') {
+        client.publish(topic, message);
+        console.log(`[MQTT] ${topic} <- ${message}`);
+    } else {
+        console.warn('publish skipped: client not ready');
+    }
+}
 
