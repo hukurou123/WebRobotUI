@@ -199,3 +199,37 @@ document.getElementById('import').addEventListener('click', () => {
 document.getElementById('importFile').addEventListener('change', (e) => {
     importJSON(e.target);
 });
+
+async function default_setting() {
+    try {
+    const response = await fetch("./default_settings.json");
+    if (!response.ok) throw new Error("failed to load default_settings.json");
+
+    const data = await response.json();
+
+    // 読み込んだ設定を localStorage に保存（importLocalStorageFile と同じような処理を再現）
+    for (const [key, value] of Object.entries(data)) {
+        if(typeof value === "string"){
+            localStorage.setItem(key, value);
+        }else{
+            localStorage.setItem(key, JSON.stringify(value));
+        }
+    }
+
+    showToast && showToast("default settings loaded!");
+
+    // UI再描画
+    try {
+      loadAllKeybinds();
+      renderTable();
+      renderGameTable();
+      renderTouchTable();
+    } catch (e) {
+        console.warn("post-load render error", e);
+    }
+
+    } catch (err) {
+        console.error(err);
+        showToast && showToast("default settings load failed: " + err.message);
+    }
+}
