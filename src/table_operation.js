@@ -1,227 +1,258 @@
 /*
     table_operation.js
     表の行追加、削除、スクロール処理
+    localStrageのセーブ・ロード
+*/
+
+/*
+TODO: 押されているキーを強調表示する機能
+    コントローラーのボタン分のインジケーターを表示する
 */
 
 
-const tbl = document.getElementById("tbl");
+let tbl = document.getElementById("tbl");
+let gp_tbl = document.getElementById("gp_tbl");
+let tp_tbl = document.getElementById("tp_tbl");
 var keybind = [];
+var gameKeybind = [];
+var cellId = ['', 'gp_', 'tp_'];
 
-// 行を追加する関数
-function add(){
-    keybind.push(new Keybind());
-    renderTable();
+// 保存前のキーを配列に同期させる関数
+function syncInputsToKeybind(tableId, cellId, targetArray){
+    // tableIdの要素を取得
+    const tblEl = document.getElementById(tableId);
+    const rows = tblEl.querySelectorAll('tr');
+    // 新しい配列を作って今表に入力してある要素をすべて配列に入れる
+    // 既存の配列にそのままやるとうまくいかないみたい
+    const newArray = Array.from(rows).slice(1).map((row, i) => {
+        const kb = new Keybind();
+        const keyEl = row.querySelector(`#${cellId}key${i}`);
+        const eventEl = row.querySelector(`#${cellId}event${i}`);
+        const topicEl = row.querySelector(`#${cellId}topic${i}`);
+        const msgEl = row.querySelector(`#${cellId}message${i}`);
+        kb.add_key(keyEl?.value || '');
+        kb.add_event(eventEl?.value || '');
+        kb.add_topic(topicEl?.value || '');
+        kb.add_message(msgEl?.value || '');
+        return kb;
+    });
+
+    // 既存の配列をいったん削除
+    targetArray.length = 0;
+    // 既存の配列に新しく作った配列を入れなおす
+    // ...newArrayはスプレッド構文
+    targetArray.push(...newArray);
 }
 
-// 行を削除する関数
-function remove(index){
-    // リストの範囲外だったら何もしない
-    if (index < 0 || index >= keybind.length) return;
 
-    keybind.splice(index, 1);
-    // リストが空になったら空行を追加
-    if (keybind.length === 0) keybind.push(new Keybind());
+// 汎用的テーブルレンダラ
+function renderGenericTable({tableId, data, options = {}, onSaveRow}){
+    const { includeIndex = false, includeDelete = false, keyEditable = true, keySelect = false, idPrefix = '' } = options;
+    // tableIdの要素をとってくる．なければ終了
+    const tblEl = document.getElementById(tableId);
+    if (!tblEl) return;
 
-    // saveKeybinds();
-    renderTable();
-}
+    // ヘッダは既存のものを利用する前提。行をすべて削除してから再描画
+    while (tblEl.rows.length > 1) tblEl.deleteRow(1);
 
-// 表を描画する関数
-function renderTable(){
-    // 表の初期化 一度全部消す
-    while (tbl.rows.length > 1) {
-        tbl.deleteRow(1);
-    }
+    // dataの分だけ繰り返し仮変数bindは設定されているキー情報
+    data.forEach((bind, i) => {
+        const tr = document.createElement('tr');
 
-    // キーバインドのリストの長さ回繰り返す bindはKeybindのインスタンス iはインデックス
-    keybind.forEach((bind, i) => {
-        const tr = document.createElement("tr");
+    // 行番号
+        if (includeIndex){
+            const tdIndex = document.createElement('td');
+            tdIndex.textContent = i + 1;
+            tdIndex.classList.add('count');
+            tr.appendChild(tdIndex);
+        }
 
-        // 行番号
-        const tdIndex = document.createElement("td");
-        tdIndex.textContent = i + 1;
-        tdIndex.classList.add('count');
-        tr.appendChild(tdIndex);
-
-        // キー
-        const tdKey = document.createElement("td");
-        const inpKey = document.createElement("input");
-        inpKey.id = `key${i}`;
-        inpKey.classList.add("cell");
-        // もしbind.get_key()が存在したらそれをvalueに設定、なければ空文字を設定
-        inpKey.value = bind.get_key() || "";
-        tdKey.appendChild(inpKey);
+    // keyの列
+        const tdKey = document.createElement('td');
+        // keyの列が編集可能な場合
+        if (keyEditable){
+            const inpKey = document.createElement('input');
+            inpKey.id = `${idPrefix}key${i}`;
+            inpKey.classList.add('cell');
+            // 三項演算子と論理和演算子を使っていろいろ
+            // bind.get_keyが関数型ならvalueにbind.get_key()(それがなければ'')を入れる
+            // bind.get_keyが関数型でないならvalueにbind.key(それがなければ'')を入れる
+            inpKey.value = (typeof bind.get_key === 'function') ? bind.get_key() || '' : (bind.key || '');
+            tdKey.appendChild(inpKey);
+        // keyの列が編集不可能な場合(選択)
+        } else if(!keyEditable && keySelect){
+            const selKey = document.createElement('select');
+            // 本当はここも引数にして拡張性を高めるべきなんだけど面倒くさいなー
+            ['Up','Down', 'Left', 'Right'].forEach(opt => {
+                const option = document.createElement('option');
+                option.text = opt;
+                // touchpad のキーは bind.key に保存されているはずなので、bind.key を基準に選択を設定
+                if ((bind.key || '') === opt) option.selected = true;
+                selKey.appendChild(option);
+            });
+            selKey.id = `${idPrefix}key${i}`;
+            selKey.classList.add('cell');
+            tdKey.appendChild(selKey);
+        // keyの列が編集不可能な場合(ゲームパッド)
+        } else {
+            // 論理和演算子 bind.keyがあるならそれを入れて，なければ''を入れる
+            tdKey.textContent = bind.key || '';
+            tdKey.id = `${idPrefix}key${i}`;
+            tdKey.classList.add('no-edit-cell');
+        }
         tr.appendChild(tdKey);
 
-        // イベント
-        const tdEvent = document.createElement("td");
+    // eventの列
+        const tdEvent = document.createElement('td');
         const sl = document.createElement('select');
-        // 選択肢の作成
-        ["down" , "up"].forEach(opt => {
-            const option = document.createElement('option');
-            option.text = opt;
-            if (bind.get_event() === opt) option.selected = true;
+        // down,upの配列を仮変数optで繰り返す
+        ['down','up'].forEach(opt => {
+            const option = document.createElement('option'); 
+            option.text = opt; 
+            // すでに保存されている選択肢を表示
+            // bind.eventあるいは''がoptと完全一致したなら option.selectedをtrueに
+            if ((bind.event || '') === opt) option.selected = true; 
             sl.appendChild(option);
         });
-        sl.id = `event${i}`;
-        sl.classList.add("cell");
+        sl.id = `${idPrefix}event${i}`;
+        sl.classList.add('cell');
         tdEvent.appendChild(sl);
         tr.appendChild(tdEvent);
 
-        // トピック
-        const tdTopic = document.createElement("td");
-        const inpTopic = document.createElement("input");
-        inpTopic.id = `topic${i}`;
-        inpTopic.classList.add("cell");
-        inpTopic.value = bind.get_topic() || "";
-        tdTopic.appendChild(inpTopic);
-        tr.appendChild(tdTopic);
+    // topicの列
+        const tdTopic = document.createElement('td');
+        const inpTopic = document.createElement('input'); 
+        inpTopic.id = `${idPrefix}topic${i}`; 
+        inpTopic.classList.add('cell'); 
+        inpTopic.value = bind.topic || '';
+        tdTopic.appendChild(inpTopic); tr.appendChild(tdTopic);
 
-        // メッセージ
-        const tdMsg = document.createElement("td");
-        const inpMsg = document.createElement("input");
-        inpMsg.id = `massage${i}`;
-        inpMsg.classList.add("cell");
-        inpMsg.value = bind.get_massage() || "";
-        tdMsg.appendChild(inpMsg);
+    // messageの列
+        const tdMsg = document.createElement('td');
+        const inpMsg = document.createElement('input'); 
+        inpMsg.id = `${idPrefix}message${i}`; 
+        inpMsg.classList.add('cell'); 
+        inpMsg.value = bind.message || '';
+        const keyName = bind.key || '';  
+        if (['Left X', 'Left Y', 'Right X', 'Right Y'].includes(keyName)) {
+            inpMsg.disabled = true;
+            inpMsg.placeholder = '(stick input)';
+            // inpMsg.classList.add('disabled-cell'); // CSSで見た目変えたいなら
+            inpMsg.dataset.axisName = keyName;
+        }
+        tdMsg.appendChild(inpMsg); 
         tr.appendChild(tdMsg);
 
-        // 削除ボタン
-        const tdDel = document.createElement("td");
-        const btnDel = document.createElement("button");
-        btnDel.textContent = "−";
-        // 削除ボタンの角を丸くしたいから,tdを背景色にするためのクラスづけ
-        tdDel.classList.add('delete-btn');
-        btnDel.onclick = () => remove(i);
-        tdDel.appendChild(btnDel);
-        tr.appendChild(tdDel);
+    // deleteの列(optional)
+        if (includeDelete){
+            const tdDel = document.createElement('td');
+            tdDel.classList.add('delete-btn');
+            const btnDel = document.createElement('button'); 
+            btnDel.textContent = '−'; 
+            // ラムダ式 delボタンがクリックされたときの処理
+            btnDel.onclick = () => {
+                if (typeof data.splice === 'function') {
+                    data.splice(i, 1);
+                    // 再描画せずにその行だけ削除
+                    const row = btnDel.closest('tr');
+                    if (row) row.remove();
+                    // もし入力内容とdataの同期が必要なら、ここで呼ぶ
+                    syncInputsToKeybind(tableId, idPrefix, data);
+                } 
+            };
+            tdDel.appendChild(btnDel);
+            tr.appendChild(tdDel);
+        }
 
-        tbl.appendChild(tr);
+        tblEl.appendChild(tr);
     });
 
-    scrollToBottom();
-}
-
-// (保存ロジックは saveKeybinds(readFromDOM = true) に統合しました)
-
-// localStrageに保存する関数
-function saveKeybinds(){
-    // 現在の入力状態を読み取って keybind を更新
-    for (let i = 0; i < keybind.length; i++){
-        const inpKey = document.getElementById(`key${i}`);
-        const sl = document.getElementById(`event${i}`);
-        const inpTopic = document.getElementById(`topic${i}`);
-        const inpMsg = document.getElementById(`massage${i}`);
-        const kb = keybind[i] || new Keybind();
-
-        if (inpKey) kb.add_key(inpKey.value);
-        if (sl) kb.add_event(sl.value);
-        if (inpTopic) kb.add_topic(inpTopic.value);
-        if (inpMsg) kb.add_massage(inpMsg.value);
-
-        keybind[i] = kb;
-    }
-
-    // map: 配列の各要素に関数を適用して、新しいmapを作る
-    // keybindのインスタンスをオブジェクトに変換して配列にする
-    const arr = keybind.map(k => ({ 
-        key: k.get_key(), 
-        event: k.get_event(), 
-        topic: k.get_topic(), 
-        massage: k.get_massage() 
-    }));
-    const toRemove = [];
-    // chatGPTとcopilot2つのAIを使用したので繰り返しの書き方が違う
-    // chatGPTはforEach使いがち
-    // すべてのlocalStorageのキーを確認して、数字だけのキーを削除する
-    for (let i = 0; i < localStorage.length; i++){
-        const k = localStorage.key(i);
-        if (!k) continue;
-        if (/^[0-9]+$/.test(k)) toRemove.push(k);
-    }
-    toRemove.forEach(k => localStorage.removeItem(k));
-    // 配列をJSON文字列に変換してlocalStrageに保存
-    localStorage.setItem('keybinds', JSON.stringify(arr));
-
-    try{
-        showToast('Saved Successfully!');
-    }catch(e){
-    }
-}
-
-// localStrageから読み込む関数
-function loadKeybinds(){
-    // localstorageからkeybindsというキーで保存されているデータを取得
-    const data = localStorage.getItem('keybinds');
-    if (data) {
-        try {
-            // JSON文字列をkeybindの配列に変換
-            const parsed = JSON.parse(data);
-            if (Array.isArray(parsed)){
-                keybind = parsed.map(obj => {
-                    const kb = new Keybind();
-                    kb.add_key(obj.key);
-                    kb.add_event(obj.event);
-                    kb.add_topic(obj.topic);
-                    kb.add_massage(obj.massage);
-                    return kb;
-                });
-                // もし配列が空だったら空行を追加
-                if (keybind.length === 0) keybind.push(new Keybind());
-                return;
-            }
-        } catch(e){
-            // もしtryのプログラムでエラーが出たらコンソールに表示
-            console.error('failed to parse keybinds', e);
-        }
-    }
-
-    // localStrageにkeybindsというキーで保存されているデータがなかった場合の処理
-    keybind = [];
-    const numericKeys = [];
-    // localStrageの全部のキーを探す
-    // 数字だけのキーを抽出してnumericKeysに追加
-    // もしもlocalStrageのキーがnullや'BrokerIP'だったり，数字でなかったら無視
-    for (let i = 0; i < localStorage.length; i++){
-        const k = localStorage.key(i);
-        if (!k) continue;
-        if (k === 'BrokerIP' || k === 'BrokerPORT' || k === 'keybinds') continue;
-        if (!/^[0-9]+$/.test(k)) continue;
-        numericKeys.push(k);
-    }
-    // numbericKeysを昇順でソート
-    // この書き方はJavaとかでも使われる． バブルソートみたいなことしてる
-    // 詳しくは調べてください
-    numericKeys.sort((a,b) => Number(a) - Number(b));
-    // numericKeysの長さ回繰り返す
-    for (const k of numericKeys){
-        try{
-            // localStrageからキーkのデータを取得してJSONをkeybindのインスタンスに変換
-            const jsObj = JSON.parse(localStorage.getItem(k));
-            const kb = new Keybind();
-            kb.add_key(jsObj.key);
-            kb.add_event(jsObj.event);
-            kb.add_topic(jsObj.topic);
-            kb.add_massage(jsObj.massage);
-            keybind.push(kb);
-        } catch(e){
-            // ignore parse errors
-        }
-    }
-    // もしも配列が空だったら空行を追加
-    if (keybind.length === 0) keybind.push(new Keybind());
+    // scroll (if this table is the main one, keep legacy behavior)
+    if (tableId === 'tbl') scrollToBottom(tbl);
+    else if (tableId === 'tp_tbl') scrollToBottom(tp_tbl);
 }
 
 // 最下行にスクロールする関数
-function scrollToBottom(){
-    const obj = tbl.parentElement;
+function scrollToBottom(scrollTarget){
+    // scrollTargetの親の要素を取得
+    const obj = scrollTarget.parentElement;
+    // 親オブジェクトの高さだけ下に？？ここはよくわかんない
     obj.scrollTop = obj.scrollHeight;
 }
 
-// 読み込み時に表を初期化
-window.onload = () => {
+// 汎用ロード
+function loadKeybindArray(keyName, addDefaults = true) {
+    // keyNameの要素をhtmlから取得
+    const data = localStorage.getItem(keyName);
+    let arr = [];
+    // dataがあれば
+    if (data) {
+        try {
+            // dataをJSON形式の文字列に変換
+            const parsed = JSON.parse(data);
+            // 文字列を配列に変換できるなら
+            if (Array.isArray(parsed)) {
+                // map型に変換．中身はKeybindのインスタンス
+                arr = parsed.map(obj => {
+                    try {
+                        // Keybindのインスタンスを作成，初期化
+                        const kb = new Keybind();
+                        kb.add_key(obj.key);
+                        kb.add_event(obj.event);
+                        kb.add_topic(obj.topic);
+                        kb.add_message(obj.message);
+                        return kb;
+                    } catch (e) {
+                        // エラーキャッチ
+                        console.warn(`Invalid Keybind entry in ${keyName}`, e);
+                        return { key: obj.key, event: obj.event, topic: obj.topic, message: obj.message };
+                    }
+                });
+            }
+        } catch (e) {
+            // エラーキャッチ
+            console.error(`Failed to parse ${keyName}`, e);
+        }
+    }
+    // 何も保存されていないデフォルト状態で1行追加する必要がある場合追加
+    // KeybindとTouchPadの場合(GamePadはボタン数だけ標準で作成されるので必要ない)
+    if (addDefaults && arr.length === 0) {
+        arr.push(new Keybind());
+    }
+    return arr;
+}
+
+// 全localStorageをオブジェクトで取得
+function getAllLocalStorage(){
+    const obj = {};
+    for (let i = 0; i < localStorage.length; i++){
+        const key = localStorage.key(i);
+        obj[key] = localStorage.getItem(key);
+    }
+    return obj;
+}
+
+// すべてのキーバインドをロードする(key, game, touch)
+function loadAllKeybinds(){
     loadKeybinds();
+    loadGameKeybinds();
+    loadTouchKeybinds();
+}
+
+// ページ読み込み時に表を初期化
+window.onload = () => {
+    // localStrage通りに表を復元
+    loadAllKeybinds();
     renderTable();
+    renderGameTable();
+    renderTouchTable();
+    // ipとポート番号をlocalStrageに保存されてる通りに復元
+    const ip = localStorage.getItem('BrokerIP');
+    const port = localStorage.getItem('BrokerPORT');
+    const ipEl = document.getElementById('ip_name');
+    const portEl = document.getElementById('port_name');
+    if (ip && ipEl) ipEl.value = ip;
+    if (port && portEl) portEl.value = port;
 };
 
 // トースト通知を表示する関数

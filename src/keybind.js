@@ -7,7 +7,7 @@ class Keybind {
     key;
     event;
     topic;
-    massage;
+    message;
 
     add_key(key){
         this.key = key;
@@ -22,8 +22,8 @@ class Keybind {
         this.topic = topic;
     }
 
-    add_massage(massage){
-        this.massage = massage;
+    add_message(message){
+        this.message = message;
     }
 
     get_key(){
@@ -38,8 +38,8 @@ class Keybind {
         return this.topic;
     }
 
-    get_massage(){
-        return this.massage;
+    get_message(){
+        return this.message;
     }
 
     change_json(rw){
@@ -47,7 +47,7 @@ class Keybind {
             key : this.key,
             event : this.event,
             topic : this.topic,
-            massage : this.massage
+            message : this.message
         };
         let obj = JSON.stringify(objlist);
         localStorage.setItem(rw, obj);
@@ -60,3 +60,47 @@ class Keybind {
         return jsObj;
     }
 }
+
+// --------- sonota iroiro ------------------------------------------------
+
+var keybind = [];
+
+// 表を追加する関数
+function add(){
+    // 再描画する前に今の入力内容をkeybind配列に保存
+    syncInputsToKeybind('tbl', '', keybind);
+    keybind.push(new Keybind());
+    renderTable();
+}
+
+// 表を描画する関数 (キー用)
+function renderTable(){
+    // 抽象化された共通レンダラを利用して描画
+    renderGenericTable({
+        tableId: 'tbl',
+        data: keybind,
+        options: {
+            includeIndex: true,
+            includeDelete: true,
+            keyEditable: true,
+            keySelect: false,
+            idPrefix: ''
+        }
+    });
+}
+
+// 汎用ロード関数を利用してlocalStrageから読み出す
+function loadKeybinds() {
+    keybind = loadKeybindArray('keybinds', true);
+}
+
+// 登録されたキーが押された時MQTT通信する
+document.addEventListener('keydown', event => {
+    const keyName = event.key;
+    setupKeyPublish(keybind, 'tbl', 'down', keyName);
+});
+
+document.addEventListener('keyup', event => {
+    const keyName = event.key;
+    setupKeyPublish(keybind, 'tbl', 'up', keyName);
+});
