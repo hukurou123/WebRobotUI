@@ -158,7 +158,8 @@ img{
 
 /* テーブルのスタイル */
 table, th, td{
-    border-collapse: collapse;
+    border-collapse: separate;
+    /* border-collapse: collapse; */
     margin: 20px;
     margin-bottom: 5px;
 }
@@ -178,13 +179,19 @@ th{
     color: #E0E0E0;
     background-color: #157CF2;
     padding: 3px;
-    border: 5px solid #3D3D3D;
-    border-top: none;
+    border: 2px solid #3D3D3D;
+    /* border-top: none; */
 }
 
 td{
     background: #E0E0E0;
-    border: 5px solid #3D3D3D;
+    border: 2px solid #3D3D3D;
+}
+
+td.active{
+    border: 2px solid #157CF2;
+    /* border-top: 5px solid #157CF2; */
+    /* transition: border 0.1s ease-in-out; */
 }
 
 /* テーブルコンテナのスタイル */

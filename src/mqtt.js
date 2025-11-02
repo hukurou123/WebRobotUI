@@ -85,6 +85,13 @@ function setupKeyPublish(array, tableId, eventType, keyName) {
                 console.log(keyToCheck + " です");
                 if (client && typeof client.publish === 'function') {
                     client.publish(kb.get_topic(), kb.get_message());
+
+                    const row = document.getElementById(`gp_key${i}`);
+                    console.log(`gp_key${i}`);
+                    if (row){
+                        row.classList.add('active');
+                        setTimeout(() => row.classList.remove('active'), 500);
+                    }
                 } else {
                     console.warn('publish skipped: client not ready');
                 }
