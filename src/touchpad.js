@@ -56,7 +56,7 @@ function tpBindButtonPress(el){
 // 画面がロードされたときの処理
 window.addEventListener('load', () => {
     // bind dpad buttons
-    ['tp_up','tp_down','tp_left','tp_right'].forEach(id => {
+    ['tp_up','tp_down','tp_left','tp_right', 'tp_Rrotate', 'tp_Lrotate'].forEach(id => {
         const el = document.getElementById(id);
         if (el) tpBindButtonPress(el);
     });

@@ -83,7 +83,7 @@ function renderGenericTable({tableId, data, options = {}, onSaveRow}){
         } else if(!keyEditable && keySelect){
             const selKey = document.createElement('select');
             // 本当はここも引数にして拡張性を高めるべきなんだけど面倒くさいなー
-            ['Up','Down', 'Left', 'Right'].forEach(opt => {
+            ['Up','Down', 'Left', 'Right', 'Rrotate', 'Lrotate'].forEach(opt => {
                 const option = document.createElement('option');
                 option.text = opt;
                 // touchpad のキーは bind.key に保存されているはずなので、bind.key を基準に選択を設定
