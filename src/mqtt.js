@@ -104,7 +104,7 @@ function stickPublish(topic, message) {
     if (!topic) return;
     if (client && typeof client.publish === 'function') {
         client.publish(topic, message);
-        console.log(`[MQTT] ${topic} <- ${message}`);
+        // console.log(`[MQTT] ${topic} <- ${message}`);
     } else {
         console.warn('publish skipped: client not ready');
     }

@@ -382,6 +382,12 @@ button:active{
     gap: 12px;
     padding: 20px 0;
 }
+.upper-row{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
 .middle-row{
     display: flex;
     align-items: center;
